@@ -1,0 +1,14 @@
+{
+  "name": "TabNap",
+  "description": "Give your tabs a little nap, as a treat.",
+  "version": "1.0",
+  "manifest_version": 3,
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icon.png"
+  },
+  "background": {
+    "service_worker": "build/background.js"
+  },
+  "permissions": ["alarms", "tabs", "storage", "idle", "notifications"]
+}
