@@ -11,8 +11,8 @@ src/popup.js    → Popup UI: snooze buttons, date picker, time calculations
 src/page.js     → Full-page UI: snoozed tab list, settings panel
 src/background.js → Service worker: alarm handling, tab wake-up, idle detection
 src/global.css  → Tailwind directives + FA Duotone icon opacity
-popup.html      → Popup entry point (loads lib/react.prod.js, build/popup.js)
-page.html       → Page entry point (loads lib/react.prod.js, build/page.js)
+popup.html      → Popup entry point (loads lib/react.js, build/popup.js)
+page.html       → Page entry point (loads lib/react.js, build/page.js)
 manifest.json   → MV3 manifest: alarms, tabs, storage, idle, notifications
 page.test.js    → Jest tests for time calculation functions
 build/          → Babel + Tailwind output (gitignored, generated)
@@ -48,7 +48,8 @@ lib/            → Vendored React/ReactDOM (prod + dev builds)
 ## Build Commands
 
 ```bash
-npm run build      # Full build: babel + tailwind + dist
+npm run build      # Dev build: babel + tailwind + dist (dev React)
+npm run build:prod # Prod build: babel + tailwind + dist (prod React)
 npm run babel      # Transpile JSX: src/ → build/
 npm run tailwind   # Generate CSS: src/global.css → build/styles.css
 npm run dist       # Package for Chrome: copies to dist/TabNap/

@@ -3,3 +3,5 @@ build
 .idea
 dist
 .DS_Store
+lib/react.js
+lib/react-dom.js
