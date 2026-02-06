@@ -1,3 +1,5 @@
+let lastWokenTabId = null;
+
 function sortedTabs(tabs) {
   return [...tabs].sort((a, b) => a.when - b.when);
 }
@@ -16,7 +18,7 @@ function checkTabs() {
       const currentTime = Date.now();
       for (let i = 0; i < sorted.length; i++) {
         let tab = sorted[i];
-        if (currentTime >= tab.when) {
+        if (currentTime + 60000 >= tab.when) {
           currentTabs.push(tab);
         } else {
           remainingTabs.push(tab);
@@ -24,10 +26,15 @@ function checkTabs() {
       }
 
       if (currentTabs.length > 0) {
-        currentTabs.forEach((tab) => {
+        currentTabs.forEach((tab, index) => {
           chrome.tabs
             .create({
               url: tab.url,
+            })
+            .then((createdTab) => {
+              if (index === 0 && createdTab) {
+                lastWokenTabId = createdTab.id;
+              }
             })
             .catch(console.error);
 
@@ -41,12 +48,16 @@ function checkTabs() {
 
         remainingTabs.sort((a, b) => a.when - b.when);
 
-        chrome.notifications.create("", {
+        const tabTitles = currentTabs.map((tab) => tab.title || tab.url).slice(0, 5);
+        const titleList = tabTitles.map((t) => "- " + t).join("\n");
+        const suffix = currentTabs.length > 5 ? "\n+ " + (currentTabs.length - 5) + " more" : "";
+
+        chrome.notifications.create("tabnap-wakeup", {
           type: "basic",
           title: "TabNap",
           message: `Woke up ${currentTabs.length} ${
             currentTabs.length > 1 ? "tabs" : "tab"
-          }`,
+          }\n${titleList}${suffix}`,
           iconUrl: "/logo.png",
         });
       }
@@ -92,6 +103,19 @@ chrome.idle.onStateChanged.addListener(function (e) {
     });
   } else {
     chrome.alarms.clear("tabnap");
+  }
+});
+
+chrome.notifications.onClicked.addListener(function (notificationId) {
+  if (notificationId === "tabnap-wakeup" && lastWokenTabId !== null) {
+    chrome.tabs
+      .update(lastWokenTabId, { active: true })
+      .then((tab) => {
+        if (tab && tab.windowId) {
+          chrome.windows.update(tab.windowId, { focused: true });
+        }
+      })
+      .catch(console.error);
   }
 });
 
