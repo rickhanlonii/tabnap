@@ -5,4 +5,6 @@ const DEFAULT_SETTINGS = {
   weekendStartsDay: 6,
   weekStartsDay: 1,
   somedayMonths: 3,
+  showNotifications: 1,
+  playWakeupSound: 1,
 };

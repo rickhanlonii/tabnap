@@ -1,7 +1,7 @@
 // background.test.js needs the chrome mock before requiring background.js
 require("./test-setup.js");
 
-const { sortedTabs, checkTabs } = require("./build/background.js");
+const { sortedTabs, checkTabs, setSettings } = require("./build/background.js");
 
 describe("sortedTabs", () => {
   test("sorts tabs ascending by when", () => {
@@ -135,6 +135,41 @@ describe("checkTabs", () => {
           message: expect.stringContaining("Tab B"),
         })
       );
+    });
+  });
+
+  test("no notification when showNotifications is off", () => {
+    const now = Date.now();
+    const tab = { url: "http://test.com", when: now - 1000, title: "Test" };
+
+    setSettings({ ...DEFAULT_SETTINGS, showNotifications: 0 });
+    chrome.storage.local.get.mockResolvedValueOnce({ tabs: [tab] });
+    chrome.storage.local.set.mockResolvedValueOnce();
+
+    checkTabs();
+
+    return new Promise((resolve) => setTimeout(resolve, 0)).then(() => {
+      expect(chrome.tabs.create).toHaveBeenCalled();
+      expect(chrome.notifications.create).not.toHaveBeenCalled();
+      setSettings({ ...DEFAULT_SETTINGS });
+    });
+  });
+
+  test("no sound when playWakeupSound is off", () => {
+    const now = Date.now();
+    const tab = { url: "http://test.com", when: now - 1000, title: "Test" };
+
+    setSettings({ ...DEFAULT_SETTINGS, playWakeupSound: 0 });
+    chrome.storage.local.get.mockResolvedValueOnce({ tabs: [tab] });
+    chrome.storage.local.set.mockResolvedValueOnce();
+
+    checkTabs();
+
+    return new Promise((resolve) => setTimeout(resolve, 0)).then(() => {
+      expect(chrome.tabs.create).toHaveBeenCalled();
+      expect(chrome.offscreen.createDocument).not.toHaveBeenCalled();
+      expect(chrome.runtime.sendMessage).not.toHaveBeenCalled();
+      setSettings({ ...DEFAULT_SETTINGS });
     });
   });
 

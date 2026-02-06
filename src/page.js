@@ -258,6 +258,35 @@ function Settings() {
           <option value="5">5 months</option>
           <option value="6">6 months</option>
         </Setting>
+        <h1 className="text-left mb-6 mt-10">Wake-Up Settings</h1>
+        <Setting
+          value={settings.showNotifications}
+          icon={<IconBell />}
+          text="Show notifications"
+          onChange={(e) => {
+            updateSettings({
+              ...settings,
+              showNotifications: parseInt(e.target.value),
+            });
+          }}
+        >
+          <option value="1">On</option>
+          <option value="0">Off</option>
+        </Setting>
+        <Setting
+          value={settings.playWakeupSound}
+          icon={<IconVolume />}
+          text="Play wake-up sound"
+          onChange={(e) => {
+            updateSettings({
+              ...settings,
+              playWakeupSound: parseInt(e.target.value),
+            });
+          }}
+        >
+          <option value="1">On</option>
+          <option value="0">Off</option>
+        </Setting>
       </div>
     </div>
   );
@@ -288,6 +317,39 @@ function IconTrash() {
       />
       <path
         d="M0 80V48a16 16 0 0 1 16-16h120l9.4-18.7A23.72 23.72 0 0 1 166.8 0h114.3a24 24 0 0 1 21.5 13.3L312 32h120a16 16 0 0 1 16 16v32a16 16 0 0 1-16 16H16A16 16 0 0 1 0 80z"
+        className="fa-primary"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+function IconBell() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+      <path
+        d="M224 480c-17.66 0-32-14.38-32-32.03h64C256 465.62 241.66 480 224 480zm-80-62.97h160c8.836 0 16-7.164 16-16 0-8.838-7.164-16-16-16H144c-8.836 0-16 7.162-16 16 0 8.836 7.164 16 16 16z"
+        className="fa-secondary"
+        fill="currentColor"
+      />
+      <path
+        d="M224 0C135.6 0 64 71.63 64 160v29.95c0 42.02-16 82.65-44.63 113.4C7.33 316.5 0 334.5 0 353.1 0 381.6 23.18 401 51.54 401h344.9C424.8 401 448 381.6 448 353.1c0-18.5-7.33-36.5-19.37-49.75C400 272.6 384 231.97 384 189.95V160C384 71.63 312.4 0 224 0z"
+        className="fa-primary"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+function IconVolume() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+      <path
+        d="M333.09 47.24L204.07 160H48c-26.51 0-48 21.49-48 48v96c0 26.51 21.49 48 48 48h156.07l129.02 112.76c29.42 25.69 75.81 5.56 75.81-33.76V81c0-39.35-46.44-59.42-75.81-33.76z"
+        className="fa-secondary"
+        fill="currentColor"
+      />
+      <path
+        d="M480 256c0-63.53-32.06-121.94-85.77-156.24-11.19-7.14-26.03-3.82-33.12 7.46-7.14 11.28-3.78 26.22 7.41 33.36C408.27 165.97 432 209.11 432 256s-23.73 90.03-63.48 115.42c-11.19 7.14-14.55 22.08-7.41 33.36 6.51 10.36 21.12 15.14 33.12 7.46C447.94 377.94 480 319.54 480 256zm-141.77-76.87c-11.58-6.33-26.19-2.16-32.61 9.45-6.39 11.61-2.16 26.2 9.45 32.61C327.98 228.28 336 241.63 336 256c0 14.38-8.02 27.72-20.92 34.81-11.61 6.41-15.84 21-9.45 32.61 6.43 11.66 21.05 15.8 32.61 9.45 28.23-15.55 45.77-45 45.77-76.88s-17.54-61.32-45.78-76.86z"
         className="fa-primary"
         fill="currentColor"
       />

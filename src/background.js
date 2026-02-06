@@ -1,5 +1,22 @@
+if (typeof importScripts !== "undefined") {
+  importScripts("/build/defaults.js");
+}
+
 let lastWokenTabId = null;
 let offscreenCreated = false;
+let currentSettings = { ...DEFAULT_SETTINGS };
+
+chrome.storage.onChanged.addListener((changes) => {
+  if (changes.settings) {
+    currentSettings = { ...DEFAULT_SETTINGS, ...changes.settings.newValue };
+  }
+});
+
+chrome.storage.local.get(["settings"]).then((result) => {
+  if (result && result.settings) {
+    currentSettings = { ...DEFAULT_SETTINGS, ...result.settings };
+  }
+});
 
 function playWakeupSound() {
   if (offscreenCreated) {
@@ -78,16 +95,20 @@ function checkTabs() {
         const titleList = tabTitles.map((t) => "- " + t).join("\n");
         const suffix = currentTabs.length > 5 ? "\n+ " + (currentTabs.length - 5) + " more" : "";
 
-        chrome.notifications.create("tabnap-wakeup", {
-          type: "basic",
-          title: "TabNap",
-          message: `Woke up ${currentTabs.length} ${
-            currentTabs.length > 1 ? "tabs" : "tab"
-          }\n${titleList}${suffix}`,
-          iconUrl: "/logo.png",
-        });
+        if (currentSettings.showNotifications) {
+          chrome.notifications.create("tabnap-wakeup", {
+            type: "basic",
+            title: "TabNap",
+            message: `Woke up ${currentTabs.length} ${
+              currentTabs.length > 1 ? "tabs" : "tab"
+            }\n${titleList}${suffix}`,
+            iconUrl: "/logo.png",
+          });
+        }
 
-        playWakeupSound();
+        if (currentSettings.playWakeupSound) {
+          playWakeupSound();
+        }
       }
 
       chrome.storage.local.set({ tabs: remainingTabs });
@@ -148,5 +169,6 @@ if (typeof jest !== "undefined") {
   module.exports = {
     checkTabs,
     sortedTabs,
+    setSettings: (s) => { currentSettings = s; },
   };
 }
