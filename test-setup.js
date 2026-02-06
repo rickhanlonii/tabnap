@@ -39,10 +39,15 @@ global.chrome = {
   windows: {
     update: jest.fn(() => Promise.resolve()),
   },
+  offscreen: {
+    createDocument: jest.fn(() => Promise.resolve()),
+  },
   runtime: {
+    sendMessage: jest.fn(),
     onInstalled: {
       addListener: jest.fn(),
     },
+    onMessage: { addListener: jest.fn() },
   },
   idle: {
     onStateChanged: {

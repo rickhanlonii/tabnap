@@ -1,4 +1,30 @@
 let lastWokenTabId = null;
+let offscreenCreated = false;
+
+function playWakeupSound() {
+  if (offscreenCreated) {
+    chrome.runtime.sendMessage({ type: "play-sound", url: "/lib/snooze.mp3" });
+    return;
+  }
+  chrome.offscreen
+    .createDocument({
+      url: "offscreen.html",
+      reasons: ["AUDIO_PLAYBACK"],
+      justification: "Playing wake-up sound for snoozed tabs",
+    })
+    .then(() => {
+      offscreenCreated = true;
+      chrome.runtime.sendMessage({ type: "play-sound", url: "/lib/snooze.mp3" });
+    })
+    .catch((err) => {
+      if (err.message && err.message.includes("already exists")) {
+        offscreenCreated = true;
+        chrome.runtime.sendMessage({ type: "play-sound", url: "/lib/snooze.mp3" });
+      } else {
+        console.error(err);
+      }
+    });
+}
 
 function sortedTabs(tabs) {
   return [...tabs].sort((a, b) => a.when - b.when);
@@ -60,6 +86,8 @@ function checkTabs() {
           }\n${titleList}${suffix}`,
           iconUrl: "/logo.png",
         });
+
+        playWakeupSound();
       }
 
       chrome.storage.local.set({ tabs: remainingTabs });
