@@ -20,7 +20,8 @@ global.chrome = {
   },
   tabs: {
     query: jest.fn(() => Promise.resolve([])),
-    create: jest.fn(() => Promise.resolve()),
+    create: jest.fn(() => Promise.resolve({ id: 1, windowId: 1 })),
+    update: jest.fn(() => Promise.resolve({ id: 1, windowId: 1 })),
     remove: jest.fn(() => Promise.resolve()),
   },
   alarms: {
@@ -33,6 +34,10 @@ global.chrome = {
   },
   notifications: {
     create: jest.fn(),
+    onClicked: { addListener: jest.fn() },
+  },
+  windows: {
+    update: jest.fn(() => Promise.resolve()),
   },
   runtime: {
     onInstalled: {
