@@ -4,7 +4,7 @@
   "description": "Give your tabs a little nap, as a treat.",
   "main": "lib/react-dom.dev.js",
   "scripts": {
-    "test": "jest page.test.js",
+    "test": "jest --setupFiles ./test-setup.js",
     "start": "npm run babel -- --watch & npm run tailwind -- --watch",
     "babel": "npx babel src --out-dir build --presets react-app/prod",
     "tailwind": "npx tailwindcss -i src/global.css -o ./build/styles.css",

@@ -6,6 +6,7 @@ const {
   getTimeForNextMondayAt9am,
   getTimeForNextMonthAt9am,
   getTimeFor9amThreeMonthsFromNow,
+  getWhenForTime,
 } = require("./build/popup.js");
 
 const DEFAULT = {
@@ -129,7 +130,7 @@ describe("getTimeFor7pmTodayInMs", () => {
     expect(getTimeFor7pmTodayInMs(DEFAULT)).toBeDate(2023, 1, 21, 19, 0, 0);
   });
 
-  test("day rolloever", () => {
+  test("day rollover", () => {
     jest.setSystemTime(new Date(2023, 1, 20, 20, 0, 0));
     expect(getTimeFor7pmTodayInMs(DEFAULT)).toBeDate(2023, 1, 21, 19, 0, 0);
   });
@@ -252,5 +253,79 @@ describe("getTimeFor9amThreeMonthsFromNow", () => {
       0,
       0
     );
+  });
+});
+
+describe("getWhenForTime", () => {
+  beforeEach(() => {
+    jest.setSystemTime(new Date(2023, 1, 20, 11, 0, 0));
+  });
+
+  test("later returns three hours from now", () => {
+    expect(getWhenForTime("later")).toBeDate(2023, 1, 20, 14, 0, 0);
+  });
+
+  test("tonight returns 7pm today", () => {
+    expect(getWhenForTime("tonight")).toBeDate(2023, 1, 20, 19, 0, 0);
+  });
+
+  test("tomorrow returns 9am tomorrow", () => {
+    expect(getWhenForTime("tomorrow")).toBeDate(2023, 1, 21, 9, 0, 0);
+  });
+
+  test("weekend returns saturday at 9am", () => {
+    expect(getWhenForTime("weekend")).toBeDate(2023, 1, 25, 9, 0, 0);
+  });
+
+  test("week returns next monday at 9am", () => {
+    expect(getWhenForTime("week")).toBeDate(2023, 1, 27, 9, 0, 0);
+  });
+
+  test("month returns next month at 9am", () => {
+    expect(getWhenForTime("month")).toBeDate(2023, 2, 20, 9, 0, 0);
+  });
+
+  test("recurring returns 9am tomorrow", () => {
+    expect(getWhenForTime("recurring")).toBeDate(2023, 1, 21, 9, 0, 0);
+  });
+
+  test("someday returns 3 months from now at 9am", () => {
+    expect(getWhenForTime("someday")).toBeDate(2023, 4, 20, 9, 0, 0);
+  });
+});
+
+describe("edge cases", () => {
+  test("getTimeForNextMonthAt9am on Jan 31 handles Feb overflow", () => {
+    jest.setSystemTime(new Date(2023, 0, 31, 11, 0, 0));
+    // Jan 31 + 1 month = Mar 3 (Feb has 28 days in 2023)
+    expect(getTimeForNextMonthAt9am(DEFAULT)).toBeDate(2023, 2, 3, 9, 0, 0);
+  });
+
+  test("getTimeFor9amThreeMonthsFromNow on Nov 30", () => {
+    jest.setSystemTime(new Date(2023, 10, 30, 11, 0, 0));
+    // Nov 30 + 3 months = Mar 1, 2024 (Feb overflow)
+    expect(getTimeFor9amThreeMonthsFromNow(DEFAULT)).toBeDate(
+      2024,
+      2,
+      1,
+      9,
+      0,
+      0
+    );
+  });
+
+  test("getTimeForSaturdayAt9am on Friday", () => {
+    jest.setSystemTime(new Date(2023, 1, 24, 11, 0, 0)); // Friday
+    expect(getTimeForSaturdayAt9am(DEFAULT)).toBeDate(2023, 1, 25, 9, 0, 0);
+  });
+
+  test("getTimeForSaturdayAt9am on Sunday", () => {
+    jest.setSystemTime(new Date(2023, 1, 19, 11, 0, 0)); // Sunday
+    expect(getTimeForSaturdayAt9am(DEFAULT)).toBeDate(2023, 1, 25, 9, 0, 0);
+  });
+
+  test("getTimeFor7pmTodayInMs at 18:59:59", () => {
+    jest.setSystemTime(new Date(2023, 1, 20, 18, 59, 59));
+    expect(getTimeFor7pmTodayInMs(DEFAULT)).toBeDate(2023, 1, 20, 19, 0, 0);
   });
 });
