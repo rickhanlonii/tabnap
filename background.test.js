@@ -79,4 +79,32 @@ describe("checkTabs", () => {
       expect(chrome.tabs.create).not.toHaveBeenCalled();
     });
   });
+
+  test("recurring tab stays in storage with updated when", () => {
+    const now = Date.now();
+    const recurringTab = {
+      url: "http://recurring.com",
+      when: now - 1000,
+      title: "Recurring",
+      recurring: true,
+    };
+
+    chrome.storage.local.get.mockResolvedValueOnce({
+      tabs: [recurringTab],
+    });
+    chrome.storage.local.set.mockResolvedValueOnce();
+
+    checkTabs();
+
+    return new Promise((resolve) => setTimeout(resolve, 0)).then(() => {
+      expect(chrome.tabs.create).toHaveBeenCalledWith({
+        url: "http://recurring.com",
+      });
+      const setCall = chrome.storage.local.set.mock.calls[0][0];
+      expect(setCall.tabs).toHaveLength(1);
+      expect(setCall.tabs[0].url).toBe("http://recurring.com");
+      expect(setCall.tabs[0].recurring).toBe(true);
+      expect(setCall.tabs[0].when).toBeGreaterThan(now);
+    });
+  });
 });

@@ -89,10 +89,13 @@ function List() {
               <div
                 className="hover:bg-slate-100 rounded p-4 items-center cursor-pointer"
                 onClick={() => {
-                  const newTabs = tabs.filter((t) => t !== tab);
-                  chrome.storage.local
-                    .set({ tabs: newTabs })
-                    .then((value) => {});
+                  chrome.storage.local.get(["tabs"]).then((result) => {
+                    const current = result.tabs || [];
+                    const newTabs = current.filter(
+                      (t) => t.url !== tab.url || t.when !== tab.when
+                    );
+                    chrome.storage.local.set({ tabs: newTabs });
+                  });
                 }}
               >
                 <div className="h-4 w-4">

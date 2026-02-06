@@ -30,7 +30,16 @@ function checkTabs() {
               url: tab.url,
             })
             .catch(console.error);
+
+          if (tab.recurring) {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            tomorrow.setHours(9, 0, 0, 0);
+            remainingTabs.push({ ...tab, when: tomorrow.getTime() });
+          }
         });
+
+        remainingTabs.sort((a, b) => a.when - b.when);
 
         chrome.notifications.create("", {
           type: "basic",

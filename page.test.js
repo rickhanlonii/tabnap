@@ -216,6 +216,25 @@ describe("getTimeForNextMondayAt9am", () => {
 
     expect(getTimeForNextMondayAt9am(DEFAULT)).toBeDate(2024, 0, 1, 9, 0, 0);
   });
+
+  test("sunday with default weekStartsDay=1 should be 1 day", () => {
+    // Feb 19 2023 is Sunday (getDay()=0), weekStartsDay=1 (Monday)
+    jest.setSystemTime(new Date(2023, 1, 19, 11, 0, 0));
+    expect(getTimeForNextMondayAt9am(DEFAULT)).toBeDate(2023, 1, 20, 9, 0, 0);
+  });
+
+  test("non-default weekStartsDay=3 on Thursday", () => {
+    // Feb 23 2023 is Thursday (getDay()=4), weekStartsDay=3 (Wednesday)
+    jest.setSystemTime(new Date(2023, 1, 23, 11, 0, 0));
+    expect(getTimeForNextMondayAt9am({ ...DEFAULT, weekStartsDay: 3 })).toBeDate(
+      2023,
+      2,
+      1,
+      9,
+      0,
+      0
+    );
+  });
 });
 
 describe("getTimeForNextMonthAt9am", () => {

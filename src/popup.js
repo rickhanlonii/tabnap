@@ -439,7 +439,7 @@ function getTimeForSaturdayAt9am(setting) {
 
 function getTimeForNextMondayAt9am(setting) {
   const now = new Date();
-  const add = setting.weekStartsDay + 7 - (now.getDay() % 7) || 7;
+  const add = (setting.weekStartsDay + 7 - now.getDay()) % 7 || 7;
   const monday = new Date(
     now.getFullYear(),
     now.getMonth(),
