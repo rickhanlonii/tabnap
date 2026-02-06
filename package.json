@@ -9,7 +9,7 @@
     "babel": "npx babel src --out-dir build --presets react-app/prod",
     "tailwind": "npx tailwindcss -i src/global.css -o ./build/styles.css",
     "prettier": "npx prettier --write .",
-    "dist": "rm -rf dist/TabNap && mkdir -p dist/TabNap && cp -r build lib icon.png manifest.json page.html popup.html dist/TabNap && rm dist/TabNap/lib/react.dev.js dist/TabNap/lib/react-dom.dev.js dist/TabNap/lib/react.prod.js dist/TabNap/lib/react-dom.prod.js",
+    "dist": "rm -rf dist/TabNap && mkdir -p dist/TabNap && cp -r build lib icon.png manifest.json page.html popup.html offscreen.html offscreen.js dist/TabNap && rm dist/TabNap/lib/react.dev.js dist/TabNap/lib/react-dom.dev.js dist/TabNap/lib/react.prod.js dist/TabNap/lib/react-dom.prod.js",
     "build": "npm run babel && npm run tailwind && npm run dist && cp lib/react.dev.js dist/TabNap/lib/react.js && cp lib/react-dom.dev.js dist/TabNap/lib/react-dom.js",
     "build:prod": "npm run babel && npm run tailwind && npm run dist && cp lib/react.prod.js dist/TabNap/lib/react.js && cp lib/react-dom.prod.js dist/TabNap/lib/react-dom.js"
   },
