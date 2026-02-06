@@ -94,12 +94,9 @@ chrome.idle.onStateChanged.addListener(function (e) {
         return;
       }
       const sorted = sortedTabs(result.tabs);
-      chrome.alarms.get("tabnap").then((a) => {
-        if (!a) {
-          chrome.alarms.create("tabnap", { when: sorted[0].when });
-        }
-        checkTabs();
-      });
+      // Wait 60s for WiFi to reconnect before waking tabs
+      const delayedWhen = Math.max(sorted[0].when, Date.now() + 60000);
+      chrome.alarms.create("tabnap", { when: delayedWhen });
     });
   } else {
     chrome.alarms.clear("tabnap");
