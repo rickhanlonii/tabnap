@@ -1,7 +1,22 @@
 // background.test.js needs the chrome mock before requiring background.js
 require("./test-setup.js");
 
-const { sortedTabs, checkTabs, setSettings } = require("./build/background.js");
+const {
+  sortedTabs,
+  checkTabs,
+  setSettings,
+  playWakeupSound,
+  resetOffscreenCreated,
+  setLastWokenTabId,
+} = require("./build/background.js");
+
+// Capture listener callbacks registered during require(), before any clearAllMocks
+const onInstalledCallback =
+  chrome.runtime.onInstalled.addListener.mock.calls[0][0];
+const idleCallback =
+  chrome.idle.onStateChanged.addListener.mock.calls[0][0];
+const notifCallback =
+  chrome.notifications.onClicked.addListener.mock.calls[0][0];
 
 describe("sortedTabs", () => {
   test("sorts tabs ascending by when", () => {
@@ -199,5 +214,283 @@ describe("checkTabs", () => {
       expect(setCall.tabs[0].recurring).toBe(true);
       expect(setCall.tabs[0].when).toBeGreaterThan(now);
     });
+  });
+
+  test("shows '+N more' suffix for >5 tabs", () => {
+    const now = Date.now();
+    const tabs = [];
+    for (let i = 0; i < 7; i++) {
+      tabs.push({ url: `http://${i}.com`, when: now - 1000, title: `Tab ${i}` });
+    }
+
+    chrome.storage.local.get.mockResolvedValueOnce({ tabs });
+    chrome.storage.local.set.mockResolvedValueOnce();
+
+    checkTabs();
+
+    return new Promise((resolve) => setTimeout(resolve, 0)).then(() => {
+      expect(chrome.notifications.create).toHaveBeenCalledWith(
+        "tabnap-wakeup",
+        expect.objectContaining({
+          message: expect.stringContaining("+ 2 more"),
+        })
+      );
+    });
+  });
+
+  test("shows singular 'tab' for 1 tab", () => {
+    const now = Date.now();
+    const tab = { url: "http://single.com", when: now - 1000, title: "Single" };
+
+    chrome.storage.local.get.mockResolvedValueOnce({ tabs: [tab] });
+    chrome.storage.local.set.mockResolvedValueOnce();
+
+    checkTabs();
+
+    return new Promise((resolve) => setTimeout(resolve, 0)).then(() => {
+      expect(chrome.notifications.create).toHaveBeenCalledWith(
+        "tabnap-wakeup",
+        expect.objectContaining({
+          message: expect.stringContaining("1 tab\n"),
+        })
+      );
+    });
+  });
+
+  test("shows plural 'tabs' for multiple tabs", () => {
+    const now = Date.now();
+    const tabs = [
+      { url: "http://a.com", when: now - 1000, title: "A" },
+      { url: "http://b.com", when: now - 500, title: "B" },
+      { url: "http://c.com", when: now - 200, title: "C" },
+    ];
+
+    chrome.storage.local.get.mockResolvedValueOnce({ tabs });
+    chrome.storage.local.set.mockResolvedValueOnce();
+
+    checkTabs();
+
+    return new Promise((resolve) => setTimeout(resolve, 0)).then(() => {
+      expect(chrome.notifications.create).toHaveBeenCalledWith(
+        "tabnap-wakeup",
+        expect.objectContaining({
+          message: expect.stringContaining("3 tabs"),
+        })
+      );
+    });
+  });
+});
+
+describe("playWakeupSound", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    resetOffscreenCreated();
+  });
+
+  test("creates offscreen document on first call and sends message", () => {
+    chrome.offscreen.createDocument.mockResolvedValueOnce();
+
+    playWakeupSound();
+
+    return new Promise((resolve) => setTimeout(resolve, 0)).then(() => {
+      expect(chrome.offscreen.createDocument).toHaveBeenCalledWith({
+        url: "offscreen.html",
+        reasons: ["AUDIO_PLAYBACK"],
+        justification: "Playing wake-up sound for snoozed tabs",
+      });
+      expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
+        type: "play-sound",
+        url: "/lib/wakeup.wav",
+      });
+    });
+  });
+
+  test("sends message directly when already created", () => {
+    // First call to set offscreenCreated = true
+    chrome.offscreen.createDocument.mockResolvedValueOnce();
+    playWakeupSound();
+
+    return new Promise((resolve) => setTimeout(resolve, 0)).then(() => {
+      jest.clearAllMocks();
+
+      // Second call should skip createDocument
+      playWakeupSound();
+
+      expect(chrome.offscreen.createDocument).not.toHaveBeenCalled();
+      expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
+        type: "play-sound",
+        url: "/lib/wakeup.wav",
+      });
+    });
+  });
+
+  test("handles 'already exists' error — still sends message and sets flag", () => {
+    const err = new Error("Only a single offscreen document may be created for a given extension. One already exists.");
+    chrome.offscreen.createDocument.mockRejectedValueOnce(err);
+
+    playWakeupSound();
+
+    return new Promise((resolve) => setTimeout(resolve, 0)).then(() => {
+      expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
+        type: "play-sound",
+        url: "/lib/wakeup.wav",
+      });
+    });
+  });
+
+  test("logs other errors to console and does not send message", () => {
+    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    const err = new Error("some other error");
+    chrome.offscreen.createDocument.mockRejectedValueOnce(err);
+
+    playWakeupSound();
+
+    return new Promise((resolve) => setTimeout(resolve, 0)).then(() => {
+      expect(consoleSpy).toHaveBeenCalledWith(err);
+      expect(chrome.runtime.sendMessage).not.toHaveBeenCalled();
+      consoleSpy.mockRestore();
+    });
+  });
+
+  test("sends correct sound URL", () => {
+    chrome.offscreen.createDocument.mockResolvedValueOnce();
+
+    playWakeupSound();
+
+    return new Promise((resolve) => setTimeout(resolve, 0)).then(() => {
+      const msg = chrome.runtime.sendMessage.mock.calls[0][0];
+      expect(msg.url).toBe("/lib/wakeup.wav");
+    });
+  });
+});
+
+describe("onInstalled listener", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test("creates alarm if none exists", () => {
+    chrome.alarms.get.mockResolvedValueOnce(null);
+    chrome.storage.local.get.mockResolvedValueOnce({ tabs: [] });
+
+    onInstalledCallback();
+
+    return new Promise((resolve) => setTimeout(resolve, 0)).then(() => {
+      expect(chrome.alarms.get).toHaveBeenCalledWith("tabnap");
+      expect(chrome.alarms.create).toHaveBeenCalledWith(
+        "tabnap",
+        expect.objectContaining({ periodInMinutes: 1.0 })
+      );
+    });
+  });
+
+  test("skips alarm creation if one already exists", () => {
+    chrome.alarms.get.mockResolvedValueOnce({ name: "tabnap" });
+    chrome.storage.local.get.mockResolvedValueOnce({ tabs: [] });
+
+    onInstalledCallback();
+
+    return new Promise((resolve) => setTimeout(resolve, 0)).then(() => {
+      expect(chrome.alarms.create).not.toHaveBeenCalled();
+    });
+  });
+
+  test("calls checkTabs on install", () => {
+    chrome.alarms.get.mockResolvedValueOnce(null);
+    chrome.storage.local.get.mockResolvedValueOnce({ tabs: [] });
+
+    onInstalledCallback();
+
+    // checkTabs calls storage.local.get
+    expect(chrome.storage.local.get).toHaveBeenCalledWith(["tabs"]);
+  });
+});
+
+describe("idle.onStateChanged listener", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test("clears alarm when idle", () => {
+    idleCallback("idle");
+    expect(chrome.alarms.clear).toHaveBeenCalledWith("tabnap");
+  });
+
+  test("clears alarm when locked", () => {
+    idleCallback("locked");
+    expect(chrome.alarms.clear).toHaveBeenCalledWith("tabnap");
+  });
+
+  test("recreates alarm on active with 60s WiFi delay for past-due tab", () => {
+    const now = Date.now();
+    const pastTab = { url: "http://past.com", when: now - 5000 };
+
+    chrome.storage.local.get.mockResolvedValueOnce({
+      tabs: [pastTab],
+    });
+
+    idleCallback("active");
+
+    return new Promise((resolve) => setTimeout(resolve, 0)).then(() => {
+      expect(chrome.alarms.create).toHaveBeenCalledWith("tabnap", {
+        when: expect.any(Number),
+      });
+      const alarmWhen = chrome.alarms.create.mock.calls[0][1].when;
+      // Should be ~60s from now, not the past tab's when
+      expect(alarmWhen).toBeGreaterThanOrEqual(now + 59000);
+      expect(alarmWhen).toBeLessThanOrEqual(now + 61000);
+    });
+  });
+
+  test("uses tab's when if >60s away", () => {
+    const now = Date.now();
+    const futureWhen = now + 300000; // 5 min in future
+    const futureTab = { url: "http://future.com", when: futureWhen };
+
+    chrome.storage.local.get.mockResolvedValueOnce({
+      tabs: [futureTab],
+    });
+
+    idleCallback("active");
+
+    return new Promise((resolve) => setTimeout(resolve, 0)).then(() => {
+      expect(chrome.alarms.create).toHaveBeenCalledWith("tabnap", {
+        when: futureWhen,
+      });
+    });
+  });
+});
+
+describe("notifications.onClicked listener", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test("focuses last woken tab on tabnap-wakeup click", () => {
+    setLastWokenTabId(99);
+    chrome.tabs.update.mockResolvedValueOnce({ id: 99, windowId: 5 });
+
+    notifCallback("tabnap-wakeup");
+
+    return new Promise((resolve) => setTimeout(resolve, 0)).then(() => {
+      expect(chrome.tabs.update).toHaveBeenCalledWith(99, { active: true });
+      expect(chrome.windows.update).toHaveBeenCalledWith(5, { focused: true });
+    });
+  });
+
+  test("ignores other notification IDs", () => {
+    setLastWokenTabId(99);
+
+    notifCallback("some-other-notification");
+
+    expect(chrome.tabs.update).not.toHaveBeenCalled();
+  });
+
+  test("ignores when lastWokenTabId is null", () => {
+    setLastWokenTabId(null);
+
+    notifCallback("tabnap-wakeup");
+
+    expect(chrome.tabs.update).not.toHaveBeenCalled();
   });
 });

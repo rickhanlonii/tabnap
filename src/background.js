@@ -169,6 +169,9 @@ if (typeof jest !== "undefined") {
   module.exports = {
     checkTabs,
     sortedTabs,
+    playWakeupSound,
     setSettings: (s) => { currentSettings = s; },
+    resetOffscreenCreated: () => { offscreenCreated = false; },
+    setLastWokenTabId: (id) => { lastWokenTabId = id; },
   };
 }

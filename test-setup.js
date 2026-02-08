@@ -10,6 +10,8 @@ global.DEFAULT_SETTINGS = {
   debugMode: 0,
 };
 
+global.window = { close: jest.fn() };
+
 global.chrome = {
   storage: {
     local: {
@@ -36,7 +38,7 @@ global.chrome = {
     },
   },
   notifications: {
-    create: jest.fn(),
+    create: jest.fn(() => Promise.resolve()),
     onClicked: { addListener: jest.fn() },
   },
   windows: {

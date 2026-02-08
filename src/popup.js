@@ -594,5 +594,6 @@ if (typeof jest === "undefined") {
     getTimeForNextMonthAt9am: getTimeForNextMonthAt9am,
     getTimeFor9amThreeMonthsFromNow: getTimeFor9amThreeMonthsFromNow,
     getWhenForTime: getWhenForTime,
+    sendTabToNapTime: sendTabToNapTime,
   };
 }
