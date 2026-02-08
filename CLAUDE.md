@@ -60,11 +60,14 @@ npm run prettier   # Format all files
 
 ## Testing
 
-- Tests are in `page.test.js` — covers time calculation functions only
-- **IMPORTANT:** Must run `npm run babel` before `npm test` — tests import from `build/popup.js`, not `src/popup.js`
+**Always run tests after making changes:** `npm run babel && npm test`
+
+- Tests import from `build/`, not `src/` — **must run `npm run babel` before `npm test`**
+- Test files: `page.test.js` (time calculations), `background.test.js` (service worker logic), `sendTabToNapTime.test.js` (snooze flow), `shared.test.js` (useChromeStorage hook)
 - Uses Jest with fake timers (`jest.useFakeTimers("modern")`)
 - Custom matcher `toBeDate(year, month, date, hours, minutes, seconds)` for date assertions
-- Conditional exports: `src/popup.js` only exports functions when `typeof jest !== "undefined"` (line 701-744)
+- Conditional exports: source files only export functions when `typeof jest !== "undefined"`
+- `test-setup.js` provides global chrome API mocks and `DEFAULT_SETTINGS`
 - Tests mock `document` and `ReactDOM` as `jest.fn()` to avoid DOM errors
 
 ## Code Conventions

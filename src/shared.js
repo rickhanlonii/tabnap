@@ -138,6 +138,10 @@ function IconBeach() {
   );
 }
 
+if (typeof jest !== "undefined") {
+  module.exports = { useChromeStorage };
+}
+
 function IconSetting() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
