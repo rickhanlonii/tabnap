@@ -1,10 +1,22 @@
 let CURRENT_SETTINGS = DEFAULT_SETTINGS;
 
+const DEBUG_BUTTONS = [
+  { text: "15 seconds", ms: 15000 },
+  { text: "30 seconds", ms: 30000 },
+  { text: "1 minute",   ms: 60000 },
+  { text: "1m 30s",     ms: 90000 },
+  { text: "2 minutes",  ms: 120000 },
+  { text: "3 minutes",  ms: 180000 },
+  { text: "5 minutes",  ms: 300000 },
+  { text: "10 minutes", ms: 600000 },
+  { text: "15 minutes", ms: 900000 },
+];
+
 function App() {
   const [route, setRoute] = React.useState("home");
 
   return (
-    <div className="bg-slate-200">
+    <div className={CURRENT_SETTINGS.debugMode ? "bg-red-100" : "bg-slate-200"}>
       <div className="w-96 h-96">
         {route === "home" ? (
           <Buttons onSelectDate={() => setRoute("date")} />
@@ -211,6 +223,21 @@ function DatePicker({ onDateSelected }) {
 }
 
 function Buttons({ onSelectDate }) {
+  if (CURRENT_SETTINGS.debugMode) {
+    return (
+      <div className="h-full w-full grid gap-px grid-cols-3 grid-rows-3 ">
+        {DEBUG_BUTTONS.map((btn) => (
+          <Button
+            key={btn.text}
+            text={btn.text}
+            Icon={IconMug}
+            time="debug"
+            when={() => Date.now() + btn.ms}
+          />
+        ))}
+      </div>
+    );
+  }
   return (
     <div className="h-full w-full grid gap-px grid-cols-3 grid-rows-3 ">
       <Button text="Later Today" Icon={IconMug} time="later"></Button>
@@ -231,7 +258,7 @@ function Buttons({ onSelectDate }) {
   );
 }
 
-function Button({ text, Icon, time, onSelect }) {
+function Button({ text, Icon, time, onSelect, when }) {
   const [selected, setSelected] = React.useState(false);
   function handleClick() {
     if (time === "pick") {
@@ -241,7 +268,7 @@ function Button({ text, Icon, time, onSelect }) {
 
     snoozeSound.play();
     setSelected(true);
-    sendTabToNapTime(text, getWhenForTime(time), time === "recurring");
+    sendTabToNapTime(text, when ? when() : getWhenForTime(time), time === "recurring");
     setTimeout(() => {
       setSelected(false);
     }, 3000);
@@ -529,7 +556,7 @@ function sendTabToNapTime(label, when, recurring) {
 }
 
 if (typeof jest === "undefined") {
-  var snoozeSound = new Audio("/lib/snooze.mp3");
+  var snoozeSound = new Audio("/lib/snooze.wav");
   var playCallback = () => {};
   snoozeSound.onended = () => {
     played = true;

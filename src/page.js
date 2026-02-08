@@ -287,6 +287,18 @@ function Settings() {
           <option value="1">On</option>
           <option value="0">Off</option>
         </Setting>
+        <h1 className="text-left mb-6 mt-10">Developer Settings</h1>
+        <Setting
+          value={settings.debugMode}
+          icon={<IconSetting />}
+          text="Debug mode (short snooze times)"
+          onChange={(e) => {
+            updateSettings({ ...settings, debugMode: parseInt(e.target.value) });
+          }}
+        >
+          <option value="0">Off</option>
+          <option value="1">On</option>
+        </Setting>
       </div>
     </div>
   );
