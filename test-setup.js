@@ -7,6 +7,7 @@ global.DEFAULT_SETTINGS = {
   somedayMonths: 3,
   showNotifications: 1,
   playWakeupSound: 1,
+  debugMode: 0,
 };
 
 global.chrome = {

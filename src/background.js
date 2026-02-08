@@ -20,7 +20,7 @@ chrome.storage.local.get(["settings"]).then((result) => {
 
 function playWakeupSound() {
   if (offscreenCreated) {
-    chrome.runtime.sendMessage({ type: "play-sound", url: "/lib/snooze.mp3" });
+    chrome.runtime.sendMessage({ type: "play-sound", url: "/lib/wakeup.wav" });
     return;
   }
   chrome.offscreen
@@ -31,12 +31,12 @@ function playWakeupSound() {
     })
     .then(() => {
       offscreenCreated = true;
-      chrome.runtime.sendMessage({ type: "play-sound", url: "/lib/snooze.mp3" });
+      chrome.runtime.sendMessage({ type: "play-sound", url: "/lib/wakeup.wav" });
     })
     .catch((err) => {
       if (err.message && err.message.includes("already exists")) {
         offscreenCreated = true;
-        chrome.runtime.sendMessage({ type: "play-sound", url: "/lib/snooze.mp3" });
+        chrome.runtime.sendMessage({ type: "play-sound", url: "/lib/wakeup.wav" });
       } else {
         console.error(err);
       }
@@ -102,8 +102,8 @@ function checkTabs() {
             message: `Woke up ${currentTabs.length} ${
               currentTabs.length > 1 ? "tabs" : "tab"
             }\n${titleList}${suffix}`,
-            iconUrl: "/logo.png",
-          });
+            iconUrl: "/icon.png",
+          }).catch(console.error);
         }
 
         if (currentSettings.playWakeupSound) {
