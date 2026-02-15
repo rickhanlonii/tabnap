@@ -4,6 +4,13 @@ global.MONTH_NAMES = iconData.MONTH_NAMES;
 global.MONTH_SHORT_NAMES = iconData.MONTH_SHORT_NAMES;
 global.DAY_NAMES = iconData.DAY_NAMES;
 
+global.makeDuotoneIcon = function (key) {
+  var d = ICON_DATA[key];
+  return function () {
+    return null;
+  };
+};
+
 global.DEFAULT_SETTINGS = {
   laterStartsHour: 3,
   tonightStartsHour: 19,

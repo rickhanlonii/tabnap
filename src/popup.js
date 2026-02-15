@@ -56,35 +56,6 @@ function App() {
     </div>
   );
 }
-const MONTH_NAMES = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
-const MONTH_SHORT_NAMES = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
-];
-const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 function DatePicker({ onDateSelected, onCancel }) {
   const [month, setMonth] = React.useState(new Date());
@@ -208,7 +179,7 @@ function DatePicker({ onDateSelected, onCancel }) {
       </div>
 
       <div className="flex flex-wrap mb-3 -mx-1">
-        {DAYS.map((day, index) => {
+        {DAY_NAMES.map((day, index) => {
           return (
             <div key={day} style={{ width: "14.26%" }} className="px-0.5">
               <div className="text-chrome-900 dark:text-chrome-50 font-medium text-center text-xs">
@@ -655,57 +626,16 @@ function Footer() {
   );
 }
 
-function IconRepeat() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-      <path
-        d="M422.66 422.66a12 12 0 0 1 0 17l-.49.46A247.11 247.11 0 0 1 256 504C119 504 8 393 8 256 8 119.19 119.65 7.76 256.46 8a247.12 247.12 0 0 1 170.85 68.69l-56.62 56.56A166.73 166.73 0 0 0 257.49 88C165.09 87.21 87.21 162 88 257.45 88.76 348 162.18 424 256 424a166.77 166.77 0 0 0 110.63-41.56A12 12 0 0 1 383 383z"
-        className="fa-secondary"
-        fill="currentColor"
-      />
-      <path
-        d="M504 57.94V192a24 24 0 0 1-24 24H345.94c-21.38 0-32.09-25.85-17-41L463 41c15.15-15.15 41-4.44 41 16.94z"
-        className="fa-primary"
-        fill="currentColor"
-      />
-    </svg>
-  );
-}
+var IconRepeat = makeDuotoneIcon("repeat");
 
-function IconCalendar() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
-      <path
-        d="M0 192v272a48 48 0 0 0 48 48h352a48 48 0 0 0 48-48V192zm192 176a16 16 0 0 1-16 16H80a16 16 0 0 1-16-16v-96a16 16 0 0 1 16-16h96a16 16 0 0 1 16 16zm112-240h32a16 16 0 0 0 16-16V16a16 16 0 0 0-16-16h-32a16 16 0 0 0-16 16v96a16 16 0 0 0 16 16zm-192 0h32a16 16 0 0 0 16-16V16a16 16 0 0 0-16-16h-32a16 16 0 0 0-16 16v96a16 16 0 0 0 16 16z"
-        className="fa-secondary"
-        fill="currentColor"
-      />
-      <path
-        d="M448 112v80H0v-80a48 48 0 0 1 48-48h48v48a16 16 0 0 0 16 16h32a16 16 0 0 0 16-16V64h128v48a16 16 0 0 0 16 16h32a16 16 0 0 0 16-16V64h48a48 48 0 0 1 48 48z"
-        className="fa-primary"
-        fill="currentColor"
-      />
-    </svg>
-  );
-}
+var IconCalendar = makeDuotoneIcon("calendar");
 
 function IconCheck({ className }) {
+  var d = ICON_DATA.check;
   return (
-    <svg
-      className={className}
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 512 512"
-    >
-      <path
-        d="M504.5 144.42L264.75 385.5 192 312.59l240.11-241a25.49 25.49 0 0 1 36.06-.14l.14.14L504.5 108a25.86 25.86 0 0 1 0 36.42z"
-        className="fa-secondary"
-        fill="currentColor"
-      />
-      <path
-        d="M264.67 385.59l-54.57 54.87a25.5 25.5 0 0 1-36.06.14l-.14-.14L7.5 273.1a25.84 25.84 0 0 1 0-36.41l36.2-36.41a25.49 25.49 0 0 1 36-.17l.16.17z"
-        className="fa-primary"
-        fill="currentColor"
-      />
+    <svg className={className} xmlns="http://www.w3.org/2000/svg" viewBox={d.viewBox}>
+      <path d={d.secondary} className="fa-secondary" fill="currentColor" />
+      <path d={d.primary} className="fa-primary" fill="currentColor" />
     </svg>
   );
 }
