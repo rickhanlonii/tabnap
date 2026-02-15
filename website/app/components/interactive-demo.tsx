@@ -421,6 +421,10 @@ function PopupDemo({
     if (activeBtn || !popupVisible || !currentTab) return;
     setActiveBtn(buttonLabel || label);
     onSnooze(label, hours);
+    try {
+      new Audio("/snooze.wav").play();
+    } catch {}
+
     setTimeout(() => {
       setPopupVisible(false);
       setPopupView("buttons");
