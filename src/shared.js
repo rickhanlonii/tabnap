@@ -332,6 +332,17 @@ function getNextRecurrence(pattern) {
       }
       return best.getTime();
     }
+    case "monthly": {
+      var dom = pattern.dayOfMonth || 1;
+      var lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+      var clampedDay = Math.min(dom, lastDay);
+      var candidate = new Date(now.getFullYear(), now.getMonth(), clampedDay, hour, minute, 0);
+      if (candidate.getTime() <= now.getTime()) {
+        var nextLastDay = new Date(now.getFullYear(), now.getMonth() + 2, 0).getDate();
+        candidate = new Date(now.getFullYear(), now.getMonth() + 1, Math.min(dom, nextLastDay), hour, minute, 0);
+      }
+      return candidate.getTime();
+    }
     default:
       return Date.now() + 86400000; // fallback: 24h from now
   }

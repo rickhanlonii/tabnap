@@ -425,4 +425,43 @@ describe("getNextRecurrence", () => {
       jest.useRealTimers();
     });
   });
+
+  describe("monthly", () => {
+    test("returns this month if day/time have not passed", () => {
+      jest.useFakeTimers("modern");
+      jest.setSystemTime(new Date(2024, 0, 10, 7, 0, 0)); // Jan 10
+      const pattern = { frequency: "monthly", hour: 9, minute: 0, dayOfMonth: 15 };
+      const result = new Date(getNextRecurrence(pattern));
+      expect(result).toBeDate(2024, 0, 15, 9, 0, 0);
+      jest.useRealTimers();
+    });
+
+    test("returns next month if day has passed", () => {
+      jest.useFakeTimers("modern");
+      jest.setSystemTime(new Date(2024, 0, 20, 10, 0, 0)); // Jan 20
+      const pattern = { frequency: "monthly", hour: 9, minute: 0, dayOfMonth: 15 };
+      const result = new Date(getNextRecurrence(pattern));
+      expect(result).toBeDate(2024, 1, 15, 9, 0, 0); // Feb 15
+      jest.useRealTimers();
+    });
+
+    test("returns next month if same day but time has passed", () => {
+      jest.useFakeTimers("modern");
+      jest.setSystemTime(new Date(2024, 0, 15, 10, 0, 0)); // Jan 15, 10am
+      const pattern = { frequency: "monthly", hour: 9, minute: 0, dayOfMonth: 15 };
+      const result = new Date(getNextRecurrence(pattern));
+      expect(result).toBeDate(2024, 1, 15, 9, 0, 0);
+      jest.useRealTimers();
+    });
+
+    test("handles day 31 in month with fewer days (clamps to last day)", () => {
+      jest.useFakeTimers("modern");
+      jest.setSystemTime(new Date(2024, 1, 1, 7, 0, 0)); // Feb 1 (leap year)
+      const pattern = { frequency: "monthly", hour: 9, minute: 0, dayOfMonth: 31 };
+      const result = new Date(getNextRecurrence(pattern));
+      // Feb has 29 days in 2024. We want to clamp: Feb 29 at 9am.
+      expect(result).toBeDate(2024, 1, 29, 9, 0, 0);
+      jest.useRealTimers();
+    });
+  });
 });
