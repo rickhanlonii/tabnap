@@ -303,6 +303,24 @@ function getTimeForNextMonthAt9am() {
   return nextMonth.getTime();
 }
 
+function getNextRecurrence(pattern) {
+  var now = new Date();
+  var hour = pattern.hour || 9;
+  var minute = pattern.minute || 0;
+
+  switch (pattern.frequency) {
+    case "daily": {
+      var candidate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minute, 0);
+      if (candidate.getTime() <= now.getTime()) {
+        candidate.setDate(candidate.getDate() + 1);
+      }
+      return candidate.getTime();
+    }
+    default:
+      return Date.now() + 86400000; // fallback: 24h from now
+  }
+}
+
 if (typeof jest !== "undefined") {
   module.exports = {
     useChromeStorage,
@@ -315,6 +333,7 @@ if (typeof jest !== "undefined") {
     getTimeForNextMondayAt9am,
     getTimeForNextMonthAt9am,
     getTimeFor9amThreeMonthsFromNow,
+    getNextRecurrence,
   };
 }
 

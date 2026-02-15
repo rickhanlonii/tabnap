@@ -343,3 +343,36 @@ describe("edge cases", () => {
     expect(getTimeFor7pmTodayInMs(DEFAULT)).toBeDate(2023, 1, 20, 19, 0, 0);
   });
 });
+
+describe("getNextRecurrence", () => {
+  const { getNextRecurrence } = require("./build/shared.js");
+
+  describe("daily", () => {
+    test("returns tomorrow at specified time when today's time has passed", () => {
+      jest.useFakeTimers("modern");
+      jest.setSystemTime(new Date(2024, 0, 15, 10, 0, 0)); // Jan 15, 10:00 AM
+      const pattern = { frequency: "daily", hour: 9, minute: 0 };
+      const result = new Date(getNextRecurrence(pattern));
+      expect(result).toBeDate(2024, 0, 16, 9, 0, 0);
+      jest.useRealTimers();
+    });
+
+    test("returns today at specified time when time has not passed", () => {
+      jest.useFakeTimers("modern");
+      jest.setSystemTime(new Date(2024, 0, 15, 7, 0, 0)); // Jan 15, 7:00 AM
+      const pattern = { frequency: "daily", hour: 9, minute: 30 };
+      const result = new Date(getNextRecurrence(pattern));
+      expect(result).toBeDate(2024, 0, 15, 9, 30, 0);
+      jest.useRealTimers();
+    });
+
+    test("returns tomorrow when current time equals pattern time", () => {
+      jest.useFakeTimers("modern");
+      jest.setSystemTime(new Date(2024, 0, 15, 9, 0, 0));
+      const pattern = { frequency: "daily", hour: 9, minute: 0 };
+      const result = new Date(getNextRecurrence(pattern));
+      expect(result).toBeDate(2024, 0, 16, 9, 0, 0);
+      jest.useRealTimers();
+    });
+  });
+});
