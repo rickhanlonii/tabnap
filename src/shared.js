@@ -50,7 +50,8 @@ function useTheme(settings) {
   }, [settings && settings.theme]);
 
   React.useEffect(() => {
-    var idx = settings && settings.colorPalette != null ? settings.colorPalette : 0;
+    var idx =
+      settings && settings.colorPalette != null ? settings.colorPalette : 0;
     var palette = COLOR_PALETTES[idx] || COLOR_PALETTES[0];
     var root = document.documentElement.style;
     root.setProperty("--accent", palette.base);
@@ -310,7 +311,14 @@ function getNextRecurrence(pattern) {
 
   switch (pattern.frequency) {
     case "daily": {
-      var candidate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minute, 0);
+      var candidate = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        hour,
+        minute,
+        0
+      );
       if (candidate.getTime() <= now.getTime()) {
         candidate.setDate(candidate.getDate() + 1);
       }
@@ -322,7 +330,14 @@ function getNextRecurrence(pattern) {
       for (var i = 0; i < days.length; i++) {
         var day = days[i];
         var daysUntil = (day - now.getDay() + 7) % 7;
-        var candidate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + daysUntil, hour, minute, 0);
+        var candidate = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate() + daysUntil,
+          hour,
+          minute,
+          0
+        );
         if (daysUntil === 0 && candidate.getTime() <= now.getTime()) {
           candidate.setDate(candidate.getDate() + 7);
         }
@@ -334,12 +349,34 @@ function getNextRecurrence(pattern) {
     }
     case "monthly": {
       var dom = pattern.dayOfMonth || 1;
-      var lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+      var lastDay = new Date(
+        now.getFullYear(),
+        now.getMonth() + 1,
+        0
+      ).getDate();
       var clampedDay = Math.min(dom, lastDay);
-      var candidate = new Date(now.getFullYear(), now.getMonth(), clampedDay, hour, minute, 0);
+      var candidate = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        clampedDay,
+        hour,
+        minute,
+        0
+      );
       if (candidate.getTime() <= now.getTime()) {
-        var nextLastDay = new Date(now.getFullYear(), now.getMonth() + 2, 0).getDate();
-        candidate = new Date(now.getFullYear(), now.getMonth() + 1, Math.min(dom, nextLastDay), hour, minute, 0);
+        var nextLastDay = new Date(
+          now.getFullYear(),
+          now.getMonth() + 2,
+          0
+        ).getDate();
+        candidate = new Date(
+          now.getFullYear(),
+          now.getMonth() + 1,
+          Math.min(dom, nextLastDay),
+          hour,
+          minute,
+          0
+        );
       }
       return candidate.getTime();
     }

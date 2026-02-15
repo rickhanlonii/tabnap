@@ -198,7 +198,12 @@ describe("sendTabToNapTime", () => {
     chrome.storage.local.set.mockResolvedValueOnce();
     chrome.storage.local.get.mockResolvedValueOnce({ tabs: [{ when: 4000 }] });
 
-    const pattern = { frequency: "weekly", hour: 14, minute: 0, weekdays: [1, 3, 5] };
+    const pattern = {
+      frequency: "weekly",
+      hour: 14,
+      minute: 0,
+      weekdays: [1, 3, 5],
+    };
     sendTabToNapTime("Repeatedly", 4000, true, pattern);
 
     return flush().then(() => {
