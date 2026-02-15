@@ -1,3 +1,9 @@
+var iconData = require("./build/icon-data.js");
+global.ICON_DATA = iconData.ICON_DATA;
+global.MONTH_NAMES = iconData.MONTH_NAMES;
+global.MONTH_SHORT_NAMES = iconData.MONTH_SHORT_NAMES;
+global.DAY_NAMES = iconData.DAY_NAMES;
+
 global.DEFAULT_SETTINGS = {
   laterStartsHour: 3,
   tonightStartsHour: 19,
