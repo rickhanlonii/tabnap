@@ -1,5 +1,6 @@
 if (typeof importScripts !== "undefined") {
   importScripts("/build/defaults.js");
+  importScripts("/build/shared.js");
 }
 
 let lastWokenTabId = null;
@@ -89,10 +90,16 @@ function checkTabs() {
             .catch(console.error);
 
           if (tab.recurring) {
-            const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            tomorrow.setHours(9, 0, 0, 0);
-            remainingTabs.push({ ...tab, when: tomorrow.getTime() });
+            var nextWhen;
+            if (tab.recurPattern) {
+              nextWhen = getNextRecurrence(tab.recurPattern);
+            } else {
+              var tomorrow = new Date();
+              tomorrow.setDate(tomorrow.getDate() + 1);
+              tomorrow.setHours(9, 0, 0, 0);
+              nextWhen = tomorrow.getTime();
+            }
+            remainingTabs.push({ ...tab, when: nextWhen });
           }
         });
 

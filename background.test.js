@@ -1,6 +1,10 @@
 // background.test.js needs the chrome mock before requiring background.js
 require("./test-setup.js");
 
+// Make shared.js globals available (in browser, background.js loads via importScripts)
+const _shared = require("./build/shared.js");
+global.getNextRecurrence = _shared.getNextRecurrence;
+
 const {
   sortedTabs,
   checkTabs,
@@ -216,6 +220,55 @@ describe("checkTabs", () => {
       expect(setCall.tabs).toHaveLength(1);
       expect(setCall.tabs[0].url).toBe("http://recurring.com");
       expect(setCall.tabs[0].recurring).toBe(true);
+      expect(setCall.tabs[0].when).toBeGreaterThan(now);
+    });
+  });
+
+  test("recurring tab with recurPattern uses getNextRecurrence for rescheduling", () => {
+    const now = Date.now();
+
+    const recurringTab = {
+      url: "http://recurring.com",
+      when: now - 1000,
+      title: "Recurring",
+      recurring: true,
+      recurPattern: { frequency: "daily", hour: 14, minute: 30 },
+    };
+
+    chrome.storage.local.get.mockResolvedValueOnce({ tabs: [recurringTab] });
+    chrome.storage.local.set.mockResolvedValueOnce();
+
+    checkTabs();
+
+    return new Promise((resolve) => setTimeout(resolve, 0)).then(() => {
+      const setCall = chrome.storage.local.set.mock.calls[0][0];
+      expect(setCall.tabs).toHaveLength(1);
+      const rescheduled = setCall.tabs[0];
+      expect(rescheduled.recurring).toBe(true);
+      expect(rescheduled.recurPattern).toEqual(recurringTab.recurPattern);
+      const nextWhen = new Date(rescheduled.when);
+      expect(nextWhen.getHours()).toBe(14);
+      expect(nextWhen.getMinutes()).toBe(30);
+    });
+  });
+
+  test("recurring tab WITHOUT recurPattern still uses legacy tomorrow-at-9am", () => {
+    const now = Date.now();
+    const recurringTab = {
+      url: "http://legacy.com",
+      when: now - 1000,
+      title: "Legacy Recurring",
+      recurring: true,
+    };
+
+    chrome.storage.local.get.mockResolvedValueOnce({ tabs: [recurringTab] });
+    chrome.storage.local.set.mockResolvedValueOnce();
+
+    checkTabs();
+
+    return new Promise((resolve) => setTimeout(resolve, 0)).then(() => {
+      const setCall = chrome.storage.local.set.mock.calls[0][0];
+      expect(setCall.tabs).toHaveLength(1);
       expect(setCall.tabs[0].when).toBeGreaterThan(now);
     });
   });
