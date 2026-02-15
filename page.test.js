@@ -375,4 +375,54 @@ describe("getNextRecurrence", () => {
       jest.useRealTimers();
     });
   });
+
+  describe("weekly", () => {
+    test("returns next matching weekday at specified time", () => {
+      jest.useFakeTimers("modern");
+      // Jan 15, 2024 is a Monday
+      jest.setSystemTime(new Date(2024, 0, 15, 10, 0, 0));
+      const pattern = { frequency: "weekly", hour: 9, minute: 0, weekdays: [3] }; // Wednesday
+      const result = new Date(getNextRecurrence(pattern));
+      expect(result).toBeDate(2024, 0, 17, 9, 0, 0); // Wed Jan 17
+      jest.useRealTimers();
+    });
+
+    test("returns today if weekday matches and time has not passed", () => {
+      jest.useFakeTimers("modern");
+      jest.setSystemTime(new Date(2024, 0, 15, 7, 0, 0)); // Monday 7am
+      const pattern = { frequency: "weekly", hour: 9, minute: 0, weekdays: [1] }; // Monday
+      const result = new Date(getNextRecurrence(pattern));
+      expect(result).toBeDate(2024, 0, 15, 9, 0, 0);
+      jest.useRealTimers();
+    });
+
+    test("skips to next week if today's weekday time has passed", () => {
+      jest.useFakeTimers("modern");
+      jest.setSystemTime(new Date(2024, 0, 15, 10, 0, 0)); // Monday 10am
+      const pattern = { frequency: "weekly", hour: 9, minute: 0, weekdays: [1] }; // Monday
+      const result = new Date(getNextRecurrence(pattern));
+      expect(result).toBeDate(2024, 0, 22, 9, 0, 0); // next Monday
+      jest.useRealTimers();
+    });
+
+    test("picks nearest weekday from multiple weekdays", () => {
+      jest.useFakeTimers("modern");
+      // Jan 15, 2024 is Monday, 10am — Mon already passed
+      jest.setSystemTime(new Date(2024, 0, 15, 10, 0, 0));
+      const pattern = { frequency: "weekly", hour: 9, minute: 0, weekdays: [1, 5] }; // Mon, Fri
+      const result = new Date(getNextRecurrence(pattern));
+      expect(result).toBeDate(2024, 0, 19, 9, 0, 0); // Friday
+      jest.useRealTimers();
+    });
+
+    test("wraps around week boundary", () => {
+      jest.useFakeTimers("modern");
+      // Jan 19, 2024 is Friday, 10am
+      jest.setSystemTime(new Date(2024, 0, 19, 10, 0, 0));
+      const pattern = { frequency: "weekly", hour: 9, minute: 0, weekdays: [1] }; // Monday
+      const result = new Date(getNextRecurrence(pattern));
+      expect(result).toBeDate(2024, 0, 22, 9, 0, 0); // next Monday
+      jest.useRealTimers();
+    });
+  });
 });
