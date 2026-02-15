@@ -2,11 +2,73 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --grid-border: #dadce0;
+  --accent: #7C3AED;
+  --accent-hover: #6D28D9;
+  --accent-dark: #A78BFA;
+  --accent-light: #EDE9FE;
+  --accent-focus: #DDD6FE;
+  --accent-darkbg: #2E1065;
+}
+.dark {
+  --grid-border: #3c4043;
+}
+
+html.dark,
+html.dark body {
+  background-color: #202124;
+}
+
 .fa-secondary {
-  opacity: 0.4;
+  opacity: 0.5;
 }
 
 html,
 body {
   height: fit-content;
+}
+
+@keyframes check-pop {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-check {
+  animation: check-pop 0.3s ease-out;
+}
+
+.grid-borders > * {
+  border-right: 1px solid var(--grid-border);
+  border-bottom: 1px solid var(--grid-border);
+}
+.grid-borders > *:nth-child(3n) {
+  border-right: none;
+}
+.grid-borders > *:nth-child(n + 7) {
+  border-bottom: none;
+}
+
+@keyframes slide-up {
+  0% {
+    transform: translate(-50%, 100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.2s ease-out;
 }

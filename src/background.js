@@ -31,12 +31,18 @@ function playWakeupSound() {
     })
     .then(() => {
       offscreenCreated = true;
-      chrome.runtime.sendMessage({ type: "play-sound", url: "/lib/wakeup.wav" });
+      chrome.runtime.sendMessage({
+        type: "play-sound",
+        url: "/lib/wakeup.wav",
+      });
     })
     .catch((err) => {
       if (err.message && err.message.includes("already exists")) {
         offscreenCreated = true;
-        chrome.runtime.sendMessage({ type: "play-sound", url: "/lib/wakeup.wav" });
+        chrome.runtime.sendMessage({
+          type: "play-sound",
+          url: "/lib/wakeup.wav",
+        });
       } else {
         console.error(err);
       }
@@ -73,6 +79,7 @@ function checkTabs() {
           chrome.tabs
             .create({
               url: tab.url,
+              active: false,
             })
             .then((createdTab) => {
               if (index === 0 && createdTab) {
@@ -91,19 +98,26 @@ function checkTabs() {
 
         remainingTabs.sort((a, b) => a.when - b.when);
 
-        const tabTitles = currentTabs.map((tab) => tab.title || tab.url).slice(0, 5);
+        const tabTitles = currentTabs
+          .map((tab) => tab.title || tab.url)
+          .slice(0, 5);
         const titleList = tabTitles.map((t) => "- " + t).join("\n");
-        const suffix = currentTabs.length > 5 ? "\n+ " + (currentTabs.length - 5) + " more" : "";
+        const suffix =
+          currentTabs.length > 5
+            ? "\n+ " + (currentTabs.length - 5) + " more"
+            : "";
 
         if (currentSettings.showNotifications) {
-          chrome.notifications.create("tabnap-wakeup", {
-            type: "basic",
-            title: "TabNap",
-            message: `Woke up ${currentTabs.length} ${
-              currentTabs.length > 1 ? "tabs" : "tab"
-            }\n${titleList}${suffix}`,
-            iconUrl: "/icon.png",
-          }).catch(console.error);
+          chrome.notifications
+            .create("tabnap-wakeup", {
+              type: "basic",
+              title: "TabNap",
+              message: `Woke up ${currentTabs.length} ${
+                currentTabs.length > 1 ? "tabs" : "tab"
+              }\n${titleList}${suffix}`,
+              iconUrl: "/icon.png",
+            })
+            .catch(console.error);
         }
 
         if (currentSettings.playWakeupSound) {
@@ -112,6 +126,31 @@ function checkTabs() {
       }
 
       chrome.storage.local.set({ tabs: remainingTabs });
+
+      if (currentTabs.length > 0) {
+        const historyEntries = currentTabs
+          .filter((tab) => !tab.recurring)
+          .map((tab) => ({
+            title: tab.title,
+            url: tab.url,
+            favicon: tab.favicon,
+            label: tab.label,
+            snoozedAt: tab.snoozedAt || null,
+            when: tab.when,
+            wokeAt: Date.now(),
+          }));
+
+        if (historyEntries.length > 0) {
+          chrome.storage.local
+            .get(["history"])
+            .then((histResult) => {
+              const existing = histResult.history || [];
+              const updated = historyEntries.concat(existing).slice(0, 200);
+              return chrome.storage.local.set({ history: updated });
+            })
+            .catch(console.error);
+        }
+      }
 
       if (remainingTabs.length > 0) {
         chrome.alarms.create("tabnap", { when: remainingTabs[0].when });
@@ -170,8 +209,14 @@ if (typeof jest !== "undefined") {
     checkTabs,
     sortedTabs,
     playWakeupSound,
-    setSettings: (s) => { currentSettings = s; },
-    resetOffscreenCreated: () => { offscreenCreated = false; },
-    setLastWokenTabId: (id) => { lastWokenTabId = id; },
+    setSettings: (s) => {
+      currentSettings = s;
+    },
+    resetOffscreenCreated: () => {
+      offscreenCreated = false;
+    },
+    setLastWokenTabId: (id) => {
+      lastWokenTabId = id;
+    },
   };
 }

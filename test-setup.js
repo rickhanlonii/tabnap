@@ -8,9 +8,22 @@ global.DEFAULT_SETTINGS = {
   showNotifications: 1,
   playWakeupSound: 1,
   debugMode: 0,
+  theme: 0,
+  colorPalette: 4,
 };
 
-global.window = { close: jest.fn() };
+global.COLOR_PALETTES = [
+  { id: "blue", name: "Blue", base: "#1A73E8", hover: "#1967D2", dark: "#8AB4F8", light: "#E8F0FE", focus: "#D2E3FC", darkBg: "#1E3A5F" },
+];
+
+global.window = {
+  close: jest.fn(),
+  matchMedia: jest.fn(() => ({
+    matches: false,
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+  })),
+};
 
 global.chrome = {
   storage: {
