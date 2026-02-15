@@ -202,6 +202,30 @@ function getHistoryTimeLabel(timestamp) {
   return monthShort + " " + date.getDate() + ", " + date.getFullYear();
 }
 
+function describeRecurPattern(pattern) {
+  var dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  switch (pattern.frequency) {
+    case "daily":
+      return "Daily";
+    case "weekly":
+      var days = (pattern.weekdays || [1]).map(function (d) { return dayNames[d]; });
+      return "Every " + days.join(", ");
+    case "monthly":
+      return "Monthly on the " + ordinal(pattern.dayOfMonth || 1);
+    case "yearly":
+      var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      return "Yearly on " + monthNames[pattern.month || 0] + " " + (pattern.dayOfYear || 1);
+    default:
+      return "Recurring";
+  }
+}
+
+function ordinal(n) {
+  var s = ["th", "st", "nd", "rd"];
+  var v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
+
 function Favicon({ tab }) {
   const [error, setError] = React.useState(false);
 
@@ -485,6 +509,11 @@ function List({ tabs }) {
                       <div className="text-sm text-chrome-500 dark:text-chrome-400">
                         {getRelativeTimeLabel(tab.when)}
                       </div>
+                      {tab.recurring && (
+                        <div className="ml-2 text-xs px-1.5 py-0.5 rounded bg-accent-light dark:bg-accent-darkbg text-accent dark:text-accent-dark">
+                          {tab.recurPattern ? describeRecurPattern(tab.recurPattern) : "Daily"}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
