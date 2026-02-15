@@ -192,6 +192,36 @@ describe("sendTabToNapTime", () => {
     });
   });
 
+  test("stores recurPattern when provided", () => {
+    chrome.tabs.query.mockResolvedValueOnce([mockTab]);
+    chrome.storage.local.get.mockResolvedValueOnce({ tabs: [] });
+    chrome.storage.local.set.mockResolvedValueOnce();
+    chrome.storage.local.get.mockResolvedValueOnce({ tabs: [{ when: 4000 }] });
+
+    const pattern = { frequency: "weekly", hour: 14, minute: 0, weekdays: [1, 3, 5] };
+    sendTabToNapTime("Repeatedly", 4000, true, pattern);
+
+    return flush().then(() => {
+      const setCall = chrome.storage.local.set.mock.calls[0][0];
+      expect(setCall.tabs[0].recurring).toBe(true);
+      expect(setCall.tabs[0].recurPattern).toEqual(pattern);
+    });
+  });
+
+  test("omits recurPattern when not provided", () => {
+    chrome.tabs.query.mockResolvedValueOnce([mockTab]);
+    chrome.storage.local.get.mockResolvedValueOnce({ tabs: [] });
+    chrome.storage.local.set.mockResolvedValueOnce();
+    chrome.storage.local.get.mockResolvedValueOnce({ tabs: [{ when: 5000 }] });
+
+    sendTabToNapTime("Later Today", 5000);
+
+    return flush().then(() => {
+      const setCall = chrome.storage.local.set.mock.calls[0][0];
+      expect(setCall.tabs[0]).not.toHaveProperty("recurPattern");
+    });
+  });
+
   test("does not call tabs.remove or window.close in test env", () => {
     chrome.tabs.query.mockResolvedValueOnce([mockTab]);
     chrome.storage.local.get.mockResolvedValueOnce({ tabs: [] });
