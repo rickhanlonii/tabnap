@@ -1,6 +1,4 @@
-const {
-  sendTabToNapTime,
-} = require("./build/popup.js");
+const { sendTabToNapTime } = require("./build/popup.js");
 
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
 
@@ -34,6 +32,7 @@ describe("sendTabToNapTime", () => {
         when: 1000,
         url: "http://example.com",
         favicon: "http://example.com/icon.png",
+        snoozedAt: expect.any(Number),
       });
     });
   });
@@ -143,8 +142,20 @@ describe("sendTabToNapTime", () => {
   });
 
   test("handles existing tabs in storage — adds to array and re-sorts", () => {
-    const existing1 = { title: "A", label: "A", when: 2000, url: "a", favicon: null };
-    const existing2 = { title: "B", label: "B", when: 6000, url: "b", favicon: null };
+    const existing1 = {
+      title: "A",
+      label: "A",
+      when: 2000,
+      url: "a",
+      favicon: null,
+    };
+    const existing2 = {
+      title: "B",
+      label: "B",
+      when: 6000,
+      url: "b",
+      favicon: null,
+    };
 
     chrome.tabs.query.mockResolvedValueOnce([mockTab]);
     chrome.storage.local.get.mockResolvedValueOnce({
@@ -167,7 +178,9 @@ describe("sendTabToNapTime", () => {
   });
 
   test("catches errors from query rejection", () => {
-    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    const consoleSpy = jest
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
     const err = new Error("query failed");
     chrome.tabs.query.mockRejectedValueOnce(err);
 

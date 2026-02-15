@@ -21,6 +21,12 @@ export function Footer() {
           >
             Chrome Web Store
           </a>
+          <a
+            href="/privacy"
+            className="hover:text-chrome-300 transition-colors"
+          >
+            Privacy Policy
+          </a>
         </div>
       </div>
     </footer>

@@ -19,6 +19,49 @@ function useChromeStorage(key, defaultValue) {
   return value;
 }
 
+function useTheme(settings) {
+  React.useEffect(() => {
+    var theme = settings && settings.theme != null ? settings.theme : 0;
+
+    function applyTheme() {
+      if (theme === 2) {
+        document.documentElement.classList.add("dark");
+      } else if (theme === 1) {
+        document.documentElement.classList.remove("dark");
+      } else {
+        if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+          document.documentElement.classList.add("dark");
+        } else {
+          document.documentElement.classList.remove("dark");
+        }
+      }
+    }
+
+    applyTheme();
+
+    var mql = window.matchMedia("(prefers-color-scheme: dark)");
+    function handleChange() {
+      if (theme === 0) applyTheme();
+    }
+    mql.addEventListener("change", handleChange);
+    return function () {
+      mql.removeEventListener("change", handleChange);
+    };
+  }, [settings && settings.theme]);
+
+  React.useEffect(() => {
+    var idx = settings && settings.colorPalette != null ? settings.colorPalette : 0;
+    var palette = COLOR_PALETTES[idx] || COLOR_PALETTES[0];
+    var root = document.documentElement.style;
+    root.setProperty("--accent", palette.base);
+    root.setProperty("--accent-hover", palette.hover);
+    root.setProperty("--accent-dark", palette.dark);
+    root.setProperty("--accent-light", palette.light);
+    root.setProperty("--accent-focus", palette.focus);
+    root.setProperty("--accent-darkbg", palette.darkBg);
+  }, [settings && settings.colorPalette]);
+}
+
 function IconMoon() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
@@ -138,8 +181,141 @@ function IconBeach() {
   );
 }
 
+function getWhenForTime(when, settings) {
+  var s = settings || DEFAULT_SETTINGS;
+  switch (when) {
+    case "later": {
+      return getTimeForThreeHoursFromNowInMs(s);
+    }
+    case "tonight": {
+      return getTimeFor7pmTodayInMs(s);
+    }
+    case "tomorrow": {
+      return getTimeFor9amTomorrowInMs(s);
+    }
+    case "weekend": {
+      return getTimeForSaturdayAt9am(s);
+    }
+    case "week": {
+      return getTimeForNextMondayAt9am(s);
+    }
+    case "month": {
+      return getTimeForNextMonthAt9am(s);
+    }
+    case "recurring": {
+      return getTimeFor9amTomorrowInMs(s);
+    }
+    case "someday":
+    default: {
+      return getTimeFor9amThreeMonthsFromNow(s);
+    }
+  }
+}
+
+function getTimeForThreeHoursFromNowInMs(setting) {
+  var now = new Date();
+  var threeHoursFromNow = new Date(
+    now.getTime() + setting.laterStartsHour * 60 * 60 * 1000
+  );
+  return threeHoursFromNow.getTime();
+}
+
+function getTimeFor7pmTodayInMs(setting) {
+  var now = new Date();
+  var sevenPM = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    setting.tonightStartsHour,
+    0,
+    0
+  );
+  if (sevenPM.getTime() <= now.getTime()) {
+    sevenPM.setDate(sevenPM.getDate() + 1);
+  }
+  return sevenPM.getTime();
+}
+
+function getTimeFor9amTomorrowInMs(setting) {
+  var now = new Date();
+  var tomorrow = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate() + 1,
+    setting.tomorrowStartsHour,
+    0,
+    0
+  );
+  return tomorrow.getTime();
+}
+
+function getTimeForSaturdayAt9am(setting) {
+  var now = new Date();
+  var add = (setting.weekendStartsDay + 7 - now.getDay()) % 7 || 7;
+  var saturday = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate() + add,
+    9,
+    0,
+    0
+  );
+  return saturday.getTime();
+}
+
+function getTimeForNextMondayAt9am(setting) {
+  var now = new Date();
+  var add = (setting.weekStartsDay + 7 - now.getDay()) % 7 || 7;
+  var monday = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate() + add,
+    9,
+    0,
+    0
+  );
+  return monday.getTime();
+}
+
+function getTimeFor9amThreeMonthsFromNow(setting) {
+  var now = new Date();
+  var threeMonthsFromNow = new Date(
+    now.getFullYear(),
+    now.getMonth() + setting.somedayMonths,
+    now.getDate(),
+    9,
+    0,
+    0
+  );
+  return threeMonthsFromNow.getTime();
+}
+
+function getTimeForNextMonthAt9am() {
+  var now = new Date();
+  var nextMonth = new Date(
+    now.getFullYear(),
+    now.getMonth() + 1,
+    now.getDate(),
+    9,
+    0,
+    0
+  );
+  return nextMonth.getTime();
+}
+
 if (typeof jest !== "undefined") {
-  module.exports = { useChromeStorage };
+  module.exports = {
+    useChromeStorage,
+    useTheme,
+    getWhenForTime,
+    getTimeForThreeHoursFromNowInMs,
+    getTimeFor7pmTodayInMs,
+    getTimeFor9amTomorrowInMs,
+    getTimeForSaturdayAt9am,
+    getTimeForNextMondayAt9am,
+    getTimeForNextMonthAt9am,
+    getTimeFor9amThreeMonthsFromNow,
+  };
 }
 
 function IconSetting() {

@@ -2,40 +2,40 @@
 
 ## Snooze Options
 
-| Feature | Tab Snooze | TabNap |
-|---------|-----------|--------|
-| Later Today | Yes | Yes |
-| Tonight | Yes | Yes |
-| Tomorrow | Yes | Yes |
-| This Weekend | Yes | Yes |
-| Next Week | Yes | Yes |
-| Someday | Yes | Yes |
-| Custom Date/Time | Yes | Yes |
-| Recurring Snooze | No | Yes |
-| Configurable Times | Yes | Yes |
+| Feature            | Tab Snooze | TabNap |
+| ------------------ | ---------- | ------ |
+| Later Today        | Yes        | Yes    |
+| Tonight            | Yes        | Yes    |
+| Tomorrow           | Yes        | Yes    |
+| This Weekend       | Yes        | Yes    |
+| Next Week          | Yes        | Yes    |
+| Someday            | Yes        | Yes    |
+| Custom Date/Time   | Yes        | Yes    |
+| Recurring Snooze   | No         | Yes    |
+| Configurable Times | Yes        | Yes    |
 
 ## Wake-Up Experience
 
-| Feature | Tab Snooze | TabNap | Status |
-|---------|-----------|--------|--------|
-| 1-minute batching window | Yes — wakes tabs within ~1 min of each other together | Yes | Implemented |
-| Clickable notifications | Yes — clicking focuses the woken tab | Yes | Implemented |
-| Tab titles in notifications | Yes — shows which tabs woke up | Yes | Implemented |
-| 60-second idle delay | Yes — waits for WiFi after sleep/lock | Yes | Implemented |
-| Wake-up sound | Yes — plays audio on tab wake | Yes (via offscreen document) | Implemented |
-| Notification toggle | Yes — can disable notifications | Yes | Implemented |
-| Sound toggle | Yes — can disable wake-up sound | Yes | Implemented |
+| Feature                     | Tab Snooze                                            | TabNap                       | Status      |
+| --------------------------- | ----------------------------------------------------- | ---------------------------- | ----------- |
+| 1-minute batching window    | Yes — wakes tabs within ~1 min of each other together | Yes                          | Implemented |
+| Clickable notifications     | Yes — clicking focuses the woken tab                  | Yes                          | Implemented |
+| Tab titles in notifications | Yes — shows which tabs woke up                        | Yes                          | Implemented |
+| 60-second idle delay        | Yes — waits for WiFi after sleep/lock                 | Yes                          | Implemented |
+| Wake-up sound               | Yes — plays audio on tab wake                         | Yes (via offscreen document) | Implemented |
+| Notification toggle         | Yes — can disable notifications                       | Yes                          | Implemented |
+| Sound toggle                | Yes — can disable wake-up sound                       | Yes                          | Implemented |
 
 ## Architecture
 
-| Aspect | Tab Snooze | TabNap |
-|--------|-----------|--------|
-| Manifest Version | MV2 (legacy) | MV3 |
-| Build System | Bundled (webpack) | No bundler (Babel + Tailwind only) |
-| UI Framework | Custom | React (globals via script tags) |
-| Audio Playback | Background page (MV2) | Offscreen document (MV3) |
-| Alarm Strategy | Per-tab alarms | Single alarm (earliest tab) |
-| Storage | chrome.storage.local | chrome.storage.local |
+| Aspect           | Tab Snooze            | TabNap                             |
+| ---------------- | --------------------- | ---------------------------------- |
+| Manifest Version | MV2 (legacy)          | MV3                                |
+| Build System     | Bundled (webpack)     | No bundler (Babel + Tailwind only) |
+| UI Framework     | Custom                | React (globals via script tags)    |
+| Audio Playback   | Background page (MV2) | Offscreen document (MV3)           |
+| Alarm Strategy   | Per-tab alarms        | Single alarm (earliest tab)        |
+| Storage          | chrome.storage.local  | chrome.storage.local               |
 
 ## Implementation Summary
 

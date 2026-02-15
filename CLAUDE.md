@@ -79,6 +79,10 @@ npm run prettier   # Format all files
 - **Chrome APIs:** Promise-style (`.then()`), not async/await. `chrome.storage.local.get/set`, `chrome.alarms.create/get/clear`, `chrome.tabs.create/remove/query`
 - **Settings:** `DEFAULT_SETTINGS` defined at top of both `popup.js` and `page.js` (duplicated). Settings loaded from storage on mount, fall back to defaults
 
+## Workflow
+
+- **Always run `npm run build` when done making changes** so the extension is ready to reload in Chrome.
+
 ## Key Technical Decisions
 
 - **Single alarm pattern:** Only one alarm named `"tabnap"` exists at a time, set to the earliest pending tab's `when`. After wake-up, reschedules for next tab

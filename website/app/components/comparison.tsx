@@ -6,6 +6,7 @@ const rows = [
   { feature: "Notification toggles", tabnap: true, others: false },
   { feature: "History with search", tabnap: true, others: false },
   { feature: "Undo delete", tabnap: true, others: false },
+  { feature: "10 accent color themes", tabnap: true, others: false },
   { feature: "Dark / light / system theme", tabnap: true, others: "Rare" },
   { feature: "Open source", tabnap: true, others: "Rare" },
   { feature: "No account required", tabnap: true, others: "Most" },

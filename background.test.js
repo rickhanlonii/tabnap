@@ -13,8 +13,7 @@ const {
 // Capture listener callbacks registered during require(), before any clearAllMocks
 const onInstalledCallback =
   chrome.runtime.onInstalled.addListener.mock.calls[0][0];
-const idleCallback =
-  chrome.idle.onStateChanged.addListener.mock.calls[0][0];
+const idleCallback = chrome.idle.onStateChanged.addListener.mock.calls[0][0];
 const notifCallback =
   chrome.notifications.onClicked.addListener.mock.calls[0][0];
 
@@ -72,9 +71,11 @@ describe("checkTabs", () => {
     return new Promise((resolve) => setTimeout(resolve, 0)).then(() => {
       expect(chrome.tabs.create).toHaveBeenCalledWith({
         url: "http://past.com",
+        active: false,
       });
       expect(chrome.tabs.create).not.toHaveBeenCalledWith({
         url: "http://future.com",
+        active: false,
       });
       expect(chrome.storage.local.set).toHaveBeenCalledWith({
         tabs: [futureTab],
@@ -118,9 +119,11 @@ describe("checkTabs", () => {
     return new Promise((resolve) => setTimeout(resolve, 0)).then(() => {
       expect(chrome.tabs.create).toHaveBeenCalledWith({
         url: "http://soon.com",
+        active: false,
       });
       expect(chrome.tabs.create).not.toHaveBeenCalledWith({
         url: "http://later.com",
+        active: false,
       });
     });
   });
@@ -207,6 +210,7 @@ describe("checkTabs", () => {
     return new Promise((resolve) => setTimeout(resolve, 0)).then(() => {
       expect(chrome.tabs.create).toHaveBeenCalledWith({
         url: "http://recurring.com",
+        active: false,
       });
       const setCall = chrome.storage.local.set.mock.calls[0][0];
       expect(setCall.tabs).toHaveLength(1);
@@ -220,7 +224,11 @@ describe("checkTabs", () => {
     const now = Date.now();
     const tabs = [];
     for (let i = 0; i < 7; i++) {
-      tabs.push({ url: `http://${i}.com`, when: now - 1000, title: `Tab ${i}` });
+      tabs.push({
+        url: `http://${i}.com`,
+        when: now - 1000,
+        title: `Tab ${i}`,
+      });
     }
 
     chrome.storage.local.get.mockResolvedValueOnce({ tabs });
@@ -279,6 +287,101 @@ describe("checkTabs", () => {
       );
     });
   });
+
+  test("writes history entries when tabs wake up", () => {
+    const now = Date.now();
+    const tab = {
+      url: "http://test.com",
+      when: now - 1000,
+      title: "Test",
+      label: "Later Today",
+      favicon: "http://test.com/icon.png",
+      snoozedAt: now - 10000,
+    };
+
+    chrome.storage.local.get
+      .mockResolvedValueOnce({ tabs: [tab] })
+      .mockResolvedValueOnce({ history: [] });
+    chrome.storage.local.set.mockResolvedValue();
+
+    checkTabs();
+
+    return new Promise((resolve) => setTimeout(resolve, 0)).then(() => {
+      // First set call is for tabs, second get is for history
+      const historyCalls = chrome.storage.local.set.mock.calls;
+      const historySet = historyCalls.find((c) => c[0].history);
+      expect(historySet).toBeDefined();
+      expect(historySet[0].history).toHaveLength(1);
+      expect(historySet[0].history[0]).toEqual(
+        expect.objectContaining({
+          title: "Test",
+          url: "http://test.com",
+          label: "Later Today",
+          snoozedAt: now - 10000,
+          wokeAt: expect.any(Number),
+        })
+      );
+    });
+  });
+
+  test("recurring tabs excluded from history", () => {
+    const now = Date.now();
+    const recurringTab = {
+      url: "http://recurring.com",
+      when: now - 1000,
+      title: "Recurring",
+      recurring: true,
+    };
+
+    chrome.storage.local.get.mockResolvedValueOnce({ tabs: [recurringTab] });
+    chrome.storage.local.set.mockResolvedValue();
+
+    checkTabs();
+
+    return new Promise((resolve) => setTimeout(resolve, 0)).then(() => {
+      // history get should not be called since all tabs are recurring
+      const getCalls = chrome.storage.local.get.mock.calls;
+      const historyGet = getCalls.find(
+        (c) => Array.isArray(c[0]) && c[0].includes("history")
+      );
+      expect(historyGet).toBeUndefined();
+    });
+  });
+
+  test("history capped at 200 entries", () => {
+    const now = Date.now();
+    const tab = {
+      url: "http://new.com",
+      when: now - 1000,
+      title: "New",
+      label: "Tonight",
+    };
+
+    const existingHistory = [];
+    for (let i = 0; i < 200; i++) {
+      existingHistory.push({
+        url: `http://${i}.com`,
+        title: `Old ${i}`,
+        wokeAt: now - 100000 - i,
+      });
+    }
+
+    chrome.storage.local.get
+      .mockResolvedValueOnce({ tabs: [tab] })
+      .mockResolvedValueOnce({ history: existingHistory });
+    chrome.storage.local.set.mockResolvedValue();
+
+    checkTabs();
+
+    return new Promise((resolve) => setTimeout(resolve, 0)).then(() => {
+      const historyCalls = chrome.storage.local.set.mock.calls;
+      const historySet = historyCalls.find((c) => c[0].history);
+      expect(historySet).toBeDefined();
+      expect(historySet[0].history).toHaveLength(200);
+      // New entry should be first
+      expect(historySet[0].history[0].url).toBe("http://new.com");
+    });
+  });
 });
 
 describe("playWakeupSound", () => {
@@ -325,7 +428,9 @@ describe("playWakeupSound", () => {
   });
 
   test("handles 'already exists' error — still sends message and sets flag", () => {
-    const err = new Error("Only a single offscreen document may be created for a given extension. One already exists.");
+    const err = new Error(
+      "Only a single offscreen document may be created for a given extension. One already exists."
+    );
     chrome.offscreen.createDocument.mockRejectedValueOnce(err);
 
     playWakeupSound();
@@ -339,7 +444,9 @@ describe("playWakeupSound", () => {
   });
 
   test("logs other errors to console and does not send message", () => {
-    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    const consoleSpy = jest
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
     const err = new Error("some other error");
     chrome.offscreen.createDocument.mockRejectedValueOnce(err);
 

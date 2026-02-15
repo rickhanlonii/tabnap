@@ -10,5 +10,12 @@
   "background": {
     "service_worker": "build/background.js"
   },
-  "permissions": ["alarms", "tabs", "storage", "idle", "notifications", "offscreen"]
+  "permissions": [
+    "alarms",
+    "tabs",
+    "storage",
+    "idle",
+    "notifications",
+    "offscreen"
+  ]
 }

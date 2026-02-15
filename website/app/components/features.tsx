@@ -24,6 +24,12 @@ const features = [
     icon: "📋",
   },
   {
+    title: "10 color themes",
+    description:
+      "Choose from 10 accent color palettes — Violet, Amber, Emerald, Rose, and more. Make it yours.",
+    icon: "🎨",
+  },
+  {
     title: "Dark mode",
     description:
       "Follows your system theme automatically. Or force light/dark in settings.",

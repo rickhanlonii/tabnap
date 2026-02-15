@@ -226,14 +226,9 @@ describe("getTimeForNextMondayAt9am", () => {
   test("non-default weekStartsDay=3 on Thursday", () => {
     // Feb 23 2023 is Thursday (getDay()=4), weekStartsDay=3 (Wednesday)
     jest.setSystemTime(new Date(2023, 1, 23, 11, 0, 0));
-    expect(getTimeForNextMondayAt9am({ ...DEFAULT, weekStartsDay: 3 })).toBeDate(
-      2023,
-      2,
-      1,
-      9,
-      0,
-      0
-    );
+    expect(
+      getTimeForNextMondayAt9am({ ...DEFAULT, weekStartsDay: 3 })
+    ).toBeDate(2023, 2, 1, 9, 0, 0);
   });
 });
 
