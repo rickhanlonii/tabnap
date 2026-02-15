@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "./components/theme-provider";
+import { ThemeToggle } from "./components/theme-toggle";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,7 +17,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "TabNap — Snooze browser tabs, reopen them later",
   description:
-    "Free, open-source Chrome extension to snooze tabs. Close tabs now, they reopen automatically at the time you choose. Recurring snooze, wake-up sounds, history, dark mode — all free.",
+    "Free Chrome extension to snooze tabs. Close tabs now, they reopen automatically at the time you choose. Recurring snooze, wake-up sounds, history, dark mode — all free.",
   keywords: [
     "tab snooze",
     "snooze tabs",
@@ -26,13 +28,12 @@ export const metadata: Metadata = {
     "reopen tabs",
     "tab scheduler",
     "free tab snooze",
-    "open source chrome extension",
   ],
   authors: [{ name: "TabNap" }],
   openGraph: {
     title: "TabNap — Snooze browser tabs, reopen them later",
     description:
-      "Free, open-source Chrome extension to snooze tabs. Close tabs now, they reopen automatically at the time you choose.",
+      "Free Chrome extension to snooze tabs. Close tabs now, they reopen automatically at the time you choose.",
     url: "https://tabnap.dev",
     siteName: "TabNap",
     images: [
@@ -50,7 +51,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "TabNap — Snooze browser tabs, reopen them later",
     description:
-      "Free, open-source Chrome extension to snooze tabs. Close tabs now, they reopen automatically at the time you choose.",
+      "Free Chrome extension to snooze tabs. Close tabs now, they reopen automatically at the time you choose.",
     images: ["/og-image.png"],
   },
   robots: {
@@ -65,11 +66,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased dark:bg-chrome-900`}
       >
-        {children}
+        <ThemeProvider>
+          <ThemeToggle />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

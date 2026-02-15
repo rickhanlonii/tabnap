@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Fragment } from "react";
 import {
   IconMoon,
   IconMug,
@@ -323,12 +323,12 @@ export function InteractiveDemo() {
   }
 
   return (
-    <section className="bg-chrome-50 py-16 sm:py-24">
+    <section className="bg-chrome-50 dark:bg-chrome-800 py-16 sm:py-24">
       <div className="mx-auto max-w-6xl px-6">
-        <h2 className="text-center text-3xl font-bold tracking-tight text-chrome-900 sm:text-4xl">
+        <h2 className="text-center text-3xl font-bold tracking-tight text-chrome-900 dark:text-white sm:text-4xl">
           See it in action
         </h2>
-        <p className="mt-4 text-center text-lg text-chrome-600 max-w-2xl mx-auto">
+        <p className="mt-4 text-center text-lg text-chrome-600 dark:text-chrome-400 max-w-2xl mx-auto">
           Click a snooze button and watch the tab appear in your list.
         </p>
         <div className="mt-12 flex flex-col lg:grid lg:grid-cols-2 gap-8 lg:h-[520px]">
@@ -350,7 +350,7 @@ export function InteractiveDemo() {
 // ── Browser frame wrapper (for the list demo) ─────────────────────────────
 function BrowserFrame({ children }: { children: React.ReactNode }) {
   return (
-    <div className="rounded-xl shadow-lg overflow-hidden border border-chrome-200 bg-white flex flex-col flex-1">
+    <div className="rounded-xl shadow-lg overflow-hidden border border-chrome-200 dark:border-chrome-900 bg-white dark:bg-chrome-900 flex flex-col flex-1">
       <TabTitleBar />
       {children}
     </div>
@@ -359,27 +359,27 @@ function BrowserFrame({ children }: { children: React.ReactNode }) {
 
 function TabTitleBar() {
   return (
-    <div className="border-b border-chrome-200">
+    <div className="border-b border-chrome-200 dark:border-chrome-800">
       {/* Tab strip — darker background */}
-      <div className="flex items-center gap-2 px-4 pt-2.5 bg-chrome-200">
+      <div className="flex items-center gap-2 px-4 pt-2.5 bg-chrome-200 dark:bg-chrome-950">
         <div className="flex gap-1.5">
           <div className="w-3 h-3 rounded-full bg-red-400" />
           <div className="w-3 h-3 rounded-full bg-yellow-400" />
           <div className="w-3 h-3 rounded-full bg-green-400" />
         </div>
         <div className="flex items-center ml-2">
-          <div className="flex items-center gap-1.5 bg-chrome-100 rounded-t-lg px-3 py-1.5 -mb-px text-sm">
+          <div className="flex items-center gap-1.5 bg-chrome-100 dark:bg-chrome-900 rounded-t-lg px-3 py-1.5 -mb-px text-sm">
             <div className="w-3.5 h-3.5 text-violet-500">
               <TabNapIcon />
             </div>
-            <span className="text-chrome-700">TabNap</span>
+            <span className="text-chrome-700 dark:text-chrome-300">TabNap</span>
           </div>
         </div>
       </div>
       {/* Toolbar — same color as active tab */}
-      <div className="bg-chrome-100 px-4 pb-2.5 pt-2 flex items-center gap-2">
+      <div className="bg-chrome-100 dark:bg-chrome-900 px-4 pb-2.5 pt-2 flex items-center gap-2">
         <NavButtons />
-        <div className="flex-1 flex items-center bg-white rounded-full px-3 py-1 border border-chrome-200">
+        <div className="flex-1 flex items-center bg-white dark:bg-chrome-950 rounded-full px-3 py-1 border border-chrome-200 dark:border-chrome-700">
           <LockIcon />
           <span className="ml-1.5 text-xs text-chrome-400 truncate">
             chrome-extension://tabnap/page.html
@@ -474,11 +474,11 @@ function PopupDemo({
 
   return (
     <div className="w-full flex flex-col min-h-0 overflow-hidden h-[420px] lg:h-full">
-      <div className="rounded-xl shadow-lg overflow-hidden border border-chrome-200 bg-white flex flex-col flex-1 min-h-0">
+      <div className="rounded-xl shadow-lg overflow-hidden border border-chrome-200 dark:border-chrome-900 bg-white dark:bg-chrome-900 flex flex-col flex-1 min-h-0">
         {/* Browser chrome: tab strip (darker) + toolbar (matches active tab) */}
         <div>
           {/* Tab strip */}
-          <div className="flex items-end gap-0 px-4 pt-2.5 bg-chrome-200">
+          <div className="flex items-end gap-0 px-4 pt-2.5 bg-chrome-200 dark:bg-chrome-950">
             <div className="flex gap-1.5 pb-2 pr-3 flex-shrink-0">
               <div className="w-3 h-3 rounded-full bg-red-400" />
               <div className="w-3 h-3 rounded-full bg-yellow-400" />
@@ -492,34 +492,47 @@ function PopupDemo({
                   nextActiveIndex !== null
                     ? i === nextActiveIndex
                     : i === activeIndex && !isClosing;
+                const isInactive = !isClosing && !isOpening && !isActive;
+                const prevIsClosing = closingIndex === i - 1;
+                const prevIsOpening = openingIndex === i - 1;
+                const prevIsActive =
+                  nextActiveIndex !== null
+                    ? i - 1 === nextActiveIndex
+                    : i - 1 === activeIndex && !prevIsClosing;
+                const prevIsInactive = i > 0 && !prevIsClosing && !prevIsOpening && !prevIsActive;
+                const showSeparator = isInactive && prevIsInactive;
                 return (
-                  <div
-                    key={tab.slotId}
-                    className={`flex items-center justify-center rounded-t-lg p-1.5 overflow-hidden ${
-                      isClosing
-                        ? "opacity-0 animate-tab-close"
-                        : isOpening
-                        ? "animate-tab-open bg-chrome-100 cursor-pointer"
-                        : isActive
-                        ? "bg-chrome-100 cursor-pointer"
-                        : "bg-chrome-300/50 hover:bg-chrome-300/80 cursor-pointer"
-                    }`}
-                    onClick={() => !isClosing && !isOpening && onSelectTab(i)}
-                  >
+                  <Fragment key={tab.slotId}>
+                    {showSeparator && (
+                      <div className="w-px self-stretch my-1.5 bg-chrome-300 dark:bg-chrome-800 flex-shrink-0" />
+                    )}
                     <div
-                      className={`w-4 h-4 rounded text-white text-[8px] font-bold flex items-center justify-center flex-shrink-0 ${tab.color}`}
+                      className={`flex items-center justify-center rounded-t-lg overflow-hidden ${
+                        isClosing
+                          ? "p-1.5 opacity-0 animate-tab-close"
+                          : isOpening
+                          ? "p-1.5 animate-tab-open bg-chrome-100 dark:bg-chrome-900 cursor-pointer"
+                          : isActive
+                          ? "px-3 py-1.5 bg-chrome-100 dark:bg-chrome-900 cursor-pointer"
+                          : "p-1.5 bg-chrome-200 dark:bg-chrome-950 hover:bg-chrome-300 dark:hover:bg-chrome-900 cursor-pointer"
+                      }`}
+                      onClick={() => !isClosing && !isOpening && onSelectTab(i)}
                     >
-                      {tab.initial}
+                      <div
+                        className={`w-4 h-4 rounded text-white text-[8px] font-bold flex items-center justify-center flex-shrink-0 ${tab.color}`}
+                      >
+                        {tab.initial}
+                      </div>
                     </div>
-                  </div>
+                  </Fragment>
                 );
               })}
             </div>
           </div>
           {/* Toolbar — same color as active tab */}
-          <div className="bg-chrome-100 px-4 pb-2.5 pt-2 flex items-center gap-2">
+          <div className="bg-chrome-100 dark:bg-chrome-900 px-4 pb-2.5 pt-2 flex items-center gap-2">
             <NavButtons />
-            <div className="flex-1 flex items-center bg-white rounded-full px-3 py-1 border border-chrome-200">
+            <div className="flex-1 flex items-center bg-white dark:bg-chrome-950 rounded-full px-3 py-1 border border-chrome-200 dark:border-chrome-700">
               <LockIcon />
               <span className="ml-1.5 text-xs text-chrome-400 truncate">
                 {currentTab?.url ?? ""}
@@ -527,7 +540,7 @@ function PopupDemo({
             </div>
             {/* Extension icon — popup hangs from this */}
             <div className="relative flex-shrink-0">
-              <div className="w-7 h-7 flex items-center justify-center rounded-full bg-violet-100 text-violet-500">
+              <div className="w-7 h-7 flex items-center justify-center rounded-full bg-violet-100 dark:bg-violet-500/20 text-violet-500">
                 <div className="w-4 h-4">
                   <TabNapIcon />
                 </div>
@@ -536,11 +549,11 @@ function PopupDemo({
           </div>
         </div>
         {/* Page content area with popup floating inside */}
-        <div className="relative border-t border-chrome-200 bg-white flex-1 overflow-hidden">
+        <div className="relative border-t border-chrome-200 dark:border-chrome-800 bg-white dark:bg-chrome-900 flex-1 overflow-hidden">
           {currentTab && <PageSkeleton type={currentTab.skeleton} />}
           {/* Popup card, right-aligned under extension icon */}
           <div
-            className={`absolute right-3 top-2 w-60 sm:w-72 rounded-lg shadow-xl border border-chrome-200 bg-white overflow-hidden origin-top-right transition-all duration-200 ${
+            className={`absolute right-3 top-2 w-60 sm:w-72 rounded-lg shadow-xl border border-chrome-200 dark:border-chrome-700 bg-white dark:bg-chrome-900 overflow-hidden origin-top-right transition-all duration-200 ${
               popupVisible ? "scale-100 opacity-100" : "scale-95 opacity-0"
             }`}
           >
@@ -555,11 +568,11 @@ function PopupDemo({
                     <button
                       key={btn.label}
                       className={`flex flex-col items-center justify-center gap-1 transition-all duration-200 cursor-pointer ${
-                        isRight ? "border-r border-chrome-200" : ""
-                      } ${isBottom ? "border-b border-chrome-200" : ""} ${
+                        isRight ? "border-r border-chrome-200 dark:border-chrome-700" : ""
+                      } ${isBottom ? "border-b border-chrome-200 dark:border-chrome-700" : ""} ${
                         isActive
-                          ? "bg-violet-50 text-violet-600"
-                          : "bg-white text-chrome-600 hover:bg-chrome-50"
+                          ? "bg-violet-50 dark:bg-violet-500/10 text-violet-600"
+                          : "bg-white dark:bg-chrome-900 text-chrome-600 dark:text-chrome-400 hover:bg-chrome-50 dark:hover:bg-chrome-800"
                       }`}
                       onClick={() =>
                         handleClick(
@@ -667,11 +680,11 @@ function DemoDatePicker({
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center">
           <button
-            className="p-0.5 rounded-full hover:bg-chrome-100 cursor-pointer"
+            className="p-0.5 rounded-full hover:bg-chrome-100 dark:hover:bg-chrome-800 cursor-pointer"
             onClick={onCancel}
           >
             <svg
-              className="w-4 h-4 text-chrome-500"
+              className="w-4 h-4 text-chrome-500 dark:text-chrome-400"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -684,18 +697,18 @@ function DemoDatePicker({
               />
             </svg>
           </button>
-          <span className="text-sm font-bold text-chrome-800 ml-1">
+          <span className="text-sm font-bold text-chrome-800 dark:text-chrome-200 ml-1">
             {MONTH_NAMES[month]}
           </span>
-          <span className="text-sm text-chrome-500 ml-1">{year}</span>
+          <span className="text-sm text-chrome-500 dark:text-chrome-400 ml-1">{year}</span>
         </div>
         <div className="flex gap-0.5">
           <button
-            className="p-0.5 rounded-full hover:bg-chrome-100 cursor-pointer"
+            className="p-0.5 rounded-full hover:bg-chrome-100 dark:hover:bg-chrome-800 cursor-pointer"
             onClick={prevMonth}
           >
             <svg
-              className="w-4 h-4 text-chrome-500"
+              className="w-4 h-4 text-chrome-500 dark:text-chrome-400"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -709,11 +722,11 @@ function DemoDatePicker({
             </svg>
           </button>
           <button
-            className="p-0.5 rounded-full hover:bg-chrome-100 cursor-pointer"
+            className="p-0.5 rounded-full hover:bg-chrome-100 dark:hover:bg-chrome-800 cursor-pointer"
             onClick={nextMonth}
           >
             <svg
-              className="w-4 h-4 text-chrome-500"
+              className="w-4 h-4 text-chrome-500 dark:text-chrome-400"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -733,7 +746,7 @@ function DemoDatePicker({
         {DAYS_SHORT.map((d) => (
           <div
             key={d}
-            className="text-center text-[10px] font-medium text-chrome-500"
+            className="text-center text-[10px] font-medium text-chrome-500 dark:text-chrome-400"
           >
             {d}
           </div>
@@ -749,10 +762,10 @@ function DemoDatePicker({
             key={d}
             className={`flex items-center justify-center text-xs rounded-full aspect-square cursor-pointer ${
               isToday(d)
-                ? "ring-1 ring-violet-400 text-violet-600 font-bold"
+                ? "ring-1 ring-violet-400 text-violet-600 dark:text-violet-400 font-bold"
                 : isPast(d)
-                  ? "text-chrome-300"
-                  : "text-chrome-700 hover:bg-chrome-100"
+                  ? "text-chrome-300 dark:text-chrome-600"
+                  : "text-chrome-700 dark:text-chrome-300 hover:bg-chrome-100 dark:hover:bg-chrome-800"
             }`}
             onClick={() => handleDateClick(d)}
           >
@@ -824,11 +837,11 @@ function DemoRecurringPicker({
       {/* Header */}
       <div className="flex items-center mb-3">
         <button
-          className="p-0.5 rounded-full hover:bg-chrome-100 cursor-pointer"
+          className="p-0.5 rounded-full hover:bg-chrome-100 dark:hover:bg-chrome-800 cursor-pointer"
           onClick={onCancel}
         >
           <svg
-            className="w-4 h-4 text-chrome-500"
+            className="w-4 h-4 text-chrome-500 dark:text-chrome-400"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -841,7 +854,7 @@ function DemoRecurringPicker({
             />
           </svg>
         </button>
-        <span className="text-sm font-bold text-chrome-800 ml-1">
+        <span className="text-sm font-bold text-chrome-800 dark:text-chrome-200 ml-1">
           Repeat Schedule
         </span>
       </div>
@@ -849,7 +862,7 @@ function DemoRecurringPicker({
       <div className="flex-1 space-y-3">
         {/* Frequency */}
         <div>
-          <div className="text-[10px] font-semibold text-chrome-400 uppercase tracking-wider mb-1">
+          <div className="text-[10px] font-semibold text-chrome-400 dark:text-chrome-500 uppercase tracking-wider mb-1">
             Frequency
           </div>
           <div className="flex gap-1">
@@ -858,8 +871,8 @@ function DemoRecurringPicker({
                 key={f}
                 className={`px-2.5 py-1 rounded-full text-xs cursor-pointer border transition-colors ${
                   frequency === f
-                    ? "border-violet-300 bg-violet-50 text-violet-600"
-                    : "border-chrome-200 text-chrome-600 hover:border-chrome-300"
+                    ? "border-violet-300 dark:border-violet-500/30 bg-violet-50 dark:bg-violet-500/10 text-violet-600"
+                    : "border-chrome-200 dark:border-chrome-700 text-chrome-600 dark:text-chrome-400 hover:border-chrome-300 dark:hover:border-chrome-600"
                 }`}
                 onClick={() => setFrequency(f)}
               >
@@ -872,7 +885,7 @@ function DemoRecurringPicker({
         {/* Weekly: day toggles */}
         {frequency === "Weekly" && (
           <div>
-            <div className="text-[10px] font-semibold text-chrome-400 uppercase tracking-wider mb-1">
+            <div className="text-[10px] font-semibold text-chrome-400 dark:text-chrome-500 uppercase tracking-wider mb-1">
               Days
             </div>
             <div className="flex gap-1">
@@ -883,8 +896,8 @@ function DemoRecurringPicker({
                     key={i}
                     className={`w-7 h-7 rounded-full flex items-center justify-center text-xs cursor-pointer border transition-colors ${
                       active
-                        ? "border-violet-300 bg-violet-50 text-violet-600"
-                        : "border-chrome-200 text-chrome-600 hover:border-chrome-300"
+                        ? "border-violet-300 dark:border-violet-500/30 bg-violet-50 dark:bg-violet-500/10 text-violet-600"
+                        : "border-chrome-200 dark:border-chrome-700 text-chrome-600 dark:text-chrome-400 hover:border-chrome-300 dark:hover:border-chrome-600"
                     }`}
                     onClick={() => toggleWeekday(i)}
                   >
@@ -899,11 +912,11 @@ function DemoRecurringPicker({
         {/* Monthly: day of month */}
         {frequency === "Monthly" && (
           <div>
-            <div className="text-[10px] font-semibold text-chrome-400 uppercase tracking-wider mb-1">
+            <div className="text-[10px] font-semibold text-chrome-400 dark:text-chrome-500 uppercase tracking-wider mb-1">
               Day of month
             </div>
             <select
-              className="py-1 px-2 rounded-md bg-white border border-chrome-200 cursor-pointer outline-none text-xs text-chrome-700"
+              className="py-1 px-2 rounded-md bg-white dark:bg-chrome-800 border border-chrome-200 dark:border-chrome-700 cursor-pointer outline-none text-xs text-chrome-700 dark:text-chrome-300"
               value={dayOfMonth}
               onChange={(e) => setDayOfMonth(parseInt(e.target.value))}
             >
@@ -918,10 +931,10 @@ function DemoRecurringPicker({
 
         {/* Time (fixed display) */}
         <div>
-          <div className="text-[10px] font-semibold text-chrome-400 uppercase tracking-wider mb-1">
+          <div className="text-[10px] font-semibold text-chrome-400 dark:text-chrome-500 uppercase tracking-wider mb-1">
             Time
           </div>
-          <div className="py-1 px-2 rounded-md bg-chrome-50 border border-chrome-200 text-xs text-chrome-700 w-fit">
+          <div className="py-1 px-2 rounded-md bg-chrome-50 dark:bg-chrome-800 border border-chrome-200 dark:border-chrome-700 text-xs text-chrome-700 dark:text-chrome-300 w-fit">
             9:00 AM
           </div>
         </div>
@@ -945,7 +958,7 @@ function ordinalSuffix(n: number): string {
 }
 
 function PageSkeleton({ type }: { type: string }) {
-  const b = "rounded bg-chrome-100"; // base block style
+  const b = "rounded bg-chrome-100 dark:bg-chrome-800"; // base block style
   switch (type) {
     case "github":
       return (
@@ -953,9 +966,9 @@ function PageSkeleton({ type }: { type: string }) {
           <div className="flex items-center gap-3">
             <div className={`w-8 h-8 rounded-full ${b}`} />
             <div className={`h-3 w-40 ${b}`} />
-            <div className={`h-5 w-16 rounded-full bg-green-100 ml-auto`} />
+            <div className={`h-5 w-16 rounded-full bg-green-100 dark:bg-green-500/20 ml-auto`} />
           </div>
-          <div className={`h-px w-full bg-chrome-100`} />
+          <div className={`h-px w-full bg-chrome-100 dark:bg-chrome-700`} />
           {[1, 2, 3].map((i) => (
             <div key={i} className="flex gap-3 items-start">
               <div className={`w-4 h-4 mt-0.5 rounded ${b}`} />
@@ -980,7 +993,7 @@ function PageSkeleton({ type }: { type: string }) {
             {[1, 2].map((i) => (
               <div key={i} className="space-y-1.5">
                 <div className={`h-2.5 w-48 ${b} opacity-70`} />
-                <div className={`h-3 w-64 rounded bg-blue-100`} />
+                <div className={`h-3 w-64 rounded bg-blue-100 dark:bg-blue-500/20`} />
                 <div className={`h-2 w-full ${b} opacity-50`} />
                 <div className={`h-2 w-4/5 ${b} opacity-50`} />
               </div>
@@ -991,12 +1004,12 @@ function PageSkeleton({ type }: { type: string }) {
     case "docs":
       return (
         <div className="flex h-full">
-          <div className="w-1/4 border-r border-chrome-100 p-3 space-y-2">
+          <div className="w-1/4 border-r border-chrome-100 dark:border-chrome-700 p-3 space-y-2">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div
                 key={i}
                 className={`h-2 ${b} ${
-                  i === 2 ? "bg-sky-100 w-full" : `w-${i % 2 ? "3/4" : "full"}`
+                  i === 2 ? "bg-sky-100 dark:bg-sky-500/20 w-full" : `w-${i % 2 ? "3/4" : "full"}`
                 }`}
               />
             ))}
@@ -1041,7 +1054,7 @@ function PageSkeleton({ type }: { type: string }) {
     case "canvas":
       return (
         <div className="flex h-full">
-          <div className="w-10 border-r border-chrome-100 p-2 space-y-3 flex flex-col items-center">
+          <div className="w-10 border-r border-chrome-100 dark:border-chrome-700 p-2 space-y-3 flex flex-col items-center">
             {[1, 2, 3, 4].map((i) => (
               <div key={i} className={`w-5 h-5 rounded ${b}`} />
             ))}
@@ -1063,9 +1076,9 @@ function PageSkeleton({ type }: { type: string }) {
           <div className="flex-1 space-y-2">
             <div className={`h-3 w-full ${b}`} />
             <div className={`h-3 w-3/4 ${b}`} />
-            <div className={`h-2 w-20 rounded bg-amber-100 mt-1`} />
+            <div className={`h-2 w-20 rounded bg-amber-100 dark:bg-amber-500/20 mt-1`} />
             <div className={`h-4 w-16 ${b} mt-2`} />
-            <div className={`h-7 w-24 rounded-full bg-amber-100 mt-2`} />
+            <div className={`h-7 w-24 rounded-full bg-amber-100 dark:bg-amber-500/20 mt-2`} />
           </div>
         </div>
       );
@@ -1074,7 +1087,7 @@ function PageSkeleton({ type }: { type: string }) {
         <div className="p-4 space-y-2.5">
           <div className={`h-5 w-3/4 ${b}`} />
           <div className={`h-2 w-32 ${b} opacity-50`} />
-          <div className={`h-px w-full bg-chrome-100 my-1`} />
+          <div className={`h-px w-full bg-chrome-100 dark:bg-chrome-700 my-1`} />
           <div className={`h-2 w-full ${b} opacity-60`} />
           <div className={`h-2 w-full ${b} opacity-60`} />
           <div className={`h-2 w-5/6 ${b} opacity-60`} />
@@ -1089,7 +1102,7 @@ function PageSkeleton({ type }: { type: string }) {
 
 function NavButtons() {
   return (
-    <div className="flex items-center gap-1 flex-shrink-0 text-chrome-400">
+    <div className="flex items-center gap-1 flex-shrink-0 text-chrome-400 dark:text-chrome-600">
       {/* Back */}
       <svg
         className="w-4 h-4"
@@ -1157,14 +1170,14 @@ function ListDemo({
   return (
     <div className="w-full flex flex-col min-h-0 overflow-hidden h-[400px] lg:h-full">
       <BrowserFrame>
-        <div className="bg-white flex flex-col flex-1 min-h-0">
+        <div className="bg-white dark:bg-chrome-900 flex flex-col flex-1 min-h-0">
           {/* Header bar */}
-          <div className="flex items-center h-11 px-4 border-b border-chrome-200 flex-shrink-0">
+          <div className="flex items-center h-11 px-4 border-b border-chrome-200 dark:border-chrome-700 flex-shrink-0">
             <div className="flex items-center gap-1.5 mr-4">
               <div className="w-5 h-5 text-violet-500">
                 <TabNapIcon />
               </div>
-              <span className="text-sm font-semibold text-chrome-800">
+              <span className="text-sm font-semibold text-chrome-800 dark:text-chrome-200">
                 TabNap
               </span>
             </div>
@@ -1179,12 +1192,12 @@ function ListDemo({
           </div>
           {/* Tab list */}
           <div className="px-4 py-3 overflow-y-auto flex-1 min-h-0">
-            <h3 className="text-sm font-semibold text-chrome-800 mb-2">
+            <h3 className="text-sm font-semibold text-chrome-800 dark:text-chrome-200 mb-2">
               Snoozed Tabs
             </h3>
             {groups.map((group) => (
               <div key={group.label} className="mb-3">
-                <div className="text-[11px] font-semibold text-chrome-400 uppercase tracking-wider py-1">
+                <div className="text-[11px] font-semibold text-chrome-400 dark:text-chrome-500 uppercase tracking-wider py-1">
                   {group.label} &middot; {group.tabs.length}{" "}
                   {group.tabs.length === 1 ? "tab" : "tabs"}
                 </div>
@@ -1217,7 +1230,7 @@ function TabRow({ tab, isNew }: { tab: SnoozedTab; isNew: boolean }) {
     <div
       ref={rowRef}
       className={`flex items-center py-2 px-2 rounded transition-colors duration-300 ${
-        highlight ? "bg-violet-50" : "hover:bg-chrome-50"
+        highlight ? "bg-violet-50 dark:bg-violet-500/10" : "hover:bg-chrome-50 dark:hover:bg-chrome-800"
       }`}
     >
       <div
@@ -1226,7 +1239,7 @@ function TabRow({ tab, isNew }: { tab: SnoozedTab; isNew: boolean }) {
         {tab.initial}
       </div>
       <div className="flex-1 min-w-0">
-        <div className="text-sm font-medium text-chrome-800 truncate">
+        <div className="text-sm font-medium text-chrome-800 dark:text-chrome-200 truncate">
           {tab.title}
         </div>
         <div className="flex gap-3 text-xs text-chrome-400">

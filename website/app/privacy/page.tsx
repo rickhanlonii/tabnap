@@ -9,16 +9,16 @@ export const metadata: Metadata = {
 export default function PrivacyPolicy() {
   return (
     <main className="mx-auto max-w-3xl px-6 py-16 sm:py-24">
-      <h1 className="text-4xl font-bold tracking-tight text-chrome-900">
+      <h1 className="text-4xl font-bold tracking-tight text-chrome-900 dark:text-white">
         Privacy Policy
       </h1>
-      <p className="mt-2 text-sm text-chrome-500">
+      <p className="mt-2 text-sm text-chrome-500 dark:text-chrome-400">
         Last updated: February 9, 2026
       </p>
 
-      <div className="mt-10 space-y-8 text-base leading-7 text-chrome-700">
+      <div className="mt-10 space-y-8 text-base leading-7 text-chrome-700 dark:text-chrome-300">
         <section>
-          <h2 className="text-xl font-semibold text-chrome-900">Overview</h2>
+          <h2 className="text-xl font-semibold text-chrome-900 dark:text-white">Overview</h2>
           <p className="mt-2">
             TabNap is a browser extension that snoozes tabs — it closes them now
             and reopens them later at a time you choose. TabNap does not
@@ -28,12 +28,12 @@ export default function PrivacyPolicy() {
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold text-chrome-900">
+          <h2 className="text-xl font-semibold text-chrome-900 dark:text-white">
             Data storage
           </h2>
           <p className="mt-2">
             TabNap stores the following data locally on your device using{" "}
-            <code className="rounded bg-chrome-100 px-1.5 py-0.5 text-sm">
+            <code className="rounded bg-chrome-100 dark:bg-chrome-800 px-1.5 py-0.5 text-sm">
               chrome.storage.local
             </code>
             :
@@ -56,7 +56,7 @@ export default function PrivacyPolicy() {
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold text-chrome-900">
+          <h2 className="text-xl font-semibold text-chrome-900 dark:text-white">
             Data collection
           </h2>
           <p className="mt-2">
@@ -72,7 +72,7 @@ export default function PrivacyPolicy() {
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold text-chrome-900">
+          <h2 className="text-xl font-semibold text-chrome-900 dark:text-white">
             Network requests
           </h2>
           <p className="mt-2">
@@ -83,7 +83,7 @@ export default function PrivacyPolicy() {
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold text-chrome-900">Permissions</h2>
+          <h2 className="text-xl font-semibold text-chrome-900 dark:text-white">Permissions</h2>
           <p className="mt-2">
             TabNap requests the following browser permissions, each used solely
             for its core functionality:
@@ -117,7 +117,7 @@ export default function PrivacyPolicy() {
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold text-chrome-900">
+          <h2 className="text-xl font-semibold text-chrome-900 dark:text-white">
             Third parties
           </h2>
           <p className="mt-2">
@@ -128,23 +128,7 @@ export default function PrivacyPolicy() {
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold text-chrome-900">Open source</h2>
-          <p className="mt-2">
-            TabNap is open source. You can inspect the full source code to
-            verify these claims. The code is available on{" "}
-            {/* TODO: Replace # with actual GitHub URL */}
-            <a
-              href="#"
-              className="text-chrome-blue hover:text-chrome-blue-hover underline"
-            >
-              GitHub
-            </a>
-            .
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-xl font-semibold text-chrome-900">
+          <h2 className="text-xl font-semibold text-chrome-900 dark:text-white">
             Changes to this policy
           </h2>
           <p className="mt-2">
@@ -154,20 +138,6 @@ export default function PrivacyPolicy() {
           </p>
         </section>
 
-        <section>
-          <h2 className="text-xl font-semibold text-chrome-900">Contact</h2>
-          <p className="mt-2">
-            If you have questions about this privacy policy, open an issue on
-            the {/* TODO: Replace # with actual GitHub URL */}
-            <a
-              href="#"
-              className="text-chrome-blue hover:text-chrome-blue-hover underline"
-            >
-              GitHub repository
-            </a>
-            .
-          </p>
-        </section>
       </div>
     </main>
   );
