@@ -35,22 +35,16 @@ const features = [
       "Follows your system theme automatically. Or force light/dark in settings.",
     icon: "🌙",
   },
-  {
-    title: "Open source",
-    description:
-      "MIT licensed on GitHub. No accounts, no tracking, no data collection. Your tabs stay on your machine.",
-    icon: "🔓",
-  },
 ];
 
 export function Features() {
   return (
-    <section className="bg-white py-16 sm:py-24">
+    <section className="bg-white dark:bg-chrome-900 py-16 sm:py-24">
       <div className="mx-auto max-w-6xl px-6">
-        <h2 className="text-center text-3xl font-bold tracking-tight text-chrome-900 sm:text-4xl">
+        <h2 className="text-center text-3xl font-bold tracking-tight text-chrome-900 dark:text-white sm:text-4xl">
           Everything you need, nothing you don&apos;t
         </h2>
-        <p className="mt-4 text-center text-lg text-chrome-600 max-w-2xl mx-auto">
+        <p className="mt-4 text-center text-lg text-chrome-600 dark:text-chrome-400 max-w-2xl mx-auto">
           No subscriptions. No sign-ups. No bloat. Just tab snoozing, done
           right.
         </p>
@@ -58,13 +52,13 @@ export function Features() {
           {features.map((feature) => (
             <div
               key={feature.title}
-              className="rounded-xl border border-chrome-200 p-6"
+              className="rounded-xl border border-chrome-200 dark:border-chrome-700 p-6"
             >
               <div className="text-3xl">{feature.icon}</div>
-              <h3 className="mt-3 text-lg font-semibold text-chrome-900">
+              <h3 className="mt-3 text-lg font-semibold text-chrome-900 dark:text-white">
                 {feature.title}
               </h3>
-              <p className="mt-2 text-base text-chrome-600">
+              <p className="mt-2 text-base text-chrome-600 dark:text-chrome-400">
                 {feature.description}
               </p>
             </div>

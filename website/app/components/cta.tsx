@@ -1,6 +1,6 @@
 export function CTA() {
   return (
-    <section className="bg-chrome-900 py-16 sm:py-24">
+    <section className="bg-chrome-900 dark:bg-chrome-950 py-16 sm:py-24">
       <div className="mx-auto max-w-4xl px-6 text-center">
         <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
           Ready to snooze some tabs?

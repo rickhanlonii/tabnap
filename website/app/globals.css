@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
   --color-chrome-50: #f8f9fa;
@@ -11,6 +12,7 @@
   --color-chrome-700: #5f6368;
   --color-chrome-800: #3c4043;
   --color-chrome-900: #202124;
+  --color-chrome-950: #171719;
   --color-chrome-blue: #7c3aed;
   --color-chrome-blue-hover: #6d28d9;
   --color-chrome-blue-light: #ede9fe;
