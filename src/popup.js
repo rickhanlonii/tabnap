@@ -294,7 +294,9 @@ function RecurringPicker({ onScheduled, onCancel }) {
     setWeekdays(function (prev) {
       if (prev.includes(day)) {
         if (prev.length === 1) return prev; // must keep at least 1
-        return prev.filter(function (d) { return d !== day; });
+        return prev.filter(function (d) {
+          return d !== day;
+        });
       }
       return prev.concat(day).sort();
     });
@@ -304,13 +306,29 @@ function RecurringPicker({ onScheduled, onCancel }) {
   for (var h = 0; h < 24; h++) {
     for (var m = 0; m < 60; m += 15) {
       var d = new Date(2024, 0, 1, h, m);
-      var label = d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+      var label = d.toLocaleTimeString([], {
+        hour: "numeric",
+        minute: "2-digit",
+      });
       timeOptions.push({ hour: h, minute: m, label: label });
     }
   }
 
   var dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  var monthNames = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
 
   return (
     <div className="bg-white dark:bg-chrome-900 p-4 w-96 h-96 flex flex-col">
@@ -320,25 +338,44 @@ function RecurringPicker({ onScheduled, onCancel }) {
           className="focus:outline-none transition ease-in-out duration-100 inline-flex cursor-pointer hover:bg-chrome-100 dark:hover:bg-chrome-700 p-1 rounded-full mr-2"
           onClick={onCancel}
         >
-          <svg className="h-5 w-5 text-chrome-700 dark:text-chrome-200 inline-flex" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+          <svg
+            className="h-5 w-5 text-chrome-700 dark:text-chrome-200 inline-flex"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M15 19l-7-7 7-7"
+            />
           </svg>
         </button>
-        <span className="text-lg font-bold text-chrome-900 dark:text-chrome-50">Repeat Schedule</span>
+        <span className="text-lg font-bold text-chrome-900 dark:text-chrome-50">
+          Repeat Schedule
+        </span>
       </div>
 
       <div className="flex-1 overflow-y-auto space-y-4">
         <div>
-          <div className="text-xs font-semibold text-chrome-500 dark:text-chrome-400 uppercase tracking-wider mb-1">Frequency</div>
+          <div className="text-xs font-semibold text-chrome-500 dark:text-chrome-400 uppercase tracking-wider mb-1">
+            Frequency
+          </div>
           <div className="flex gap-1">
             {["daily", "weekly", "monthly", "yearly"].map(function (f) {
               return (
                 <div
                   key={f}
-                  className={"px-3 py-1.5 rounded-full text-sm cursor-pointer border " + (frequency === f
-                    ? "border-accent bg-accent-light dark:bg-accent-darkbg text-accent dark:text-accent-dark"
-                    : "border-chrome-300 dark:border-chrome-700 text-chrome-700 dark:text-chrome-200 hover:border-chrome-400 dark:hover:border-chrome-500")}
-                  onClick={function () { setFrequency(f); }}
+                  className={
+                    "px-3 py-1.5 rounded-full text-sm cursor-pointer border " +
+                    (frequency === f
+                      ? "border-accent bg-accent-light dark:bg-accent-darkbg text-accent dark:text-accent-dark"
+                      : "border-chrome-300 dark:border-chrome-700 text-chrome-700 dark:text-chrome-200 hover:border-chrome-400 dark:hover:border-chrome-500")
+                  }
+                  onClick={function () {
+                    setFrequency(f);
+                  }}
                 >
                   {f.charAt(0).toUpperCase() + f.slice(1)}
                 </div>
@@ -349,17 +386,24 @@ function RecurringPicker({ onScheduled, onCancel }) {
 
         {frequency === "weekly" && (
           <div>
-            <div className="text-xs font-semibold text-chrome-500 dark:text-chrome-400 uppercase tracking-wider mb-1">Days</div>
+            <div className="text-xs font-semibold text-chrome-500 dark:text-chrome-400 uppercase tracking-wider mb-1">
+              Days
+            </div>
             <div className="flex gap-1">
               {dayNames.map(function (name, i) {
                 var active = weekdays.includes(i);
                 return (
                   <div
                     key={i}
-                    className={"w-10 h-10 rounded-full flex items-center justify-center text-sm cursor-pointer border " + (active
-                      ? "border-accent bg-accent-light dark:bg-accent-darkbg text-accent dark:text-accent-dark"
-                      : "border-chrome-300 dark:border-chrome-700 text-chrome-700 dark:text-chrome-200 hover:border-chrome-400 dark:hover:border-chrome-500")}
-                    onClick={function () { toggleWeekday(i); }}
+                    className={
+                      "w-10 h-10 rounded-full flex items-center justify-center text-sm cursor-pointer border " +
+                      (active
+                        ? "border-accent bg-accent-light dark:bg-accent-darkbg text-accent dark:text-accent-dark"
+                        : "border-chrome-300 dark:border-chrome-700 text-chrome-700 dark:text-chrome-200 hover:border-chrome-400 dark:hover:border-chrome-500")
+                    }
+                    onClick={function () {
+                      toggleWeekday(i);
+                    }}
                   >
                     {name.charAt(0)}
                   </div>
@@ -371,14 +415,24 @@ function RecurringPicker({ onScheduled, onCancel }) {
 
         {frequency === "monthly" && (
           <div>
-            <div className="text-xs font-semibold text-chrome-500 dark:text-chrome-400 uppercase tracking-wider mb-1">Day of month</div>
+            <div className="text-xs font-semibold text-chrome-500 dark:text-chrome-400 uppercase tracking-wider mb-1">
+              Day of month
+            </div>
             <select
               className="py-1 px-2 rounded-md bg-white dark:bg-chrome-800 border border-chrome-300 dark:border-chrome-900 cursor-pointer outline-none text-chrome-900 dark:text-chrome-50"
               value={dayOfMonth}
-              onChange={function (e) { setDayOfMonth(parseInt(e.target.value)); }}
+              onChange={function (e) {
+                setDayOfMonth(parseInt(e.target.value));
+              }}
             >
-              {Array.from({ length: 31 }, function (_, i) { return i + 1; }).map(function (d) {
-                return <option key={d} value={d}>{d}</option>;
+              {Array.from({ length: 31 }, function (_, i) {
+                return i + 1;
+              }).map(function (d) {
+                return (
+                  <option key={d} value={d}>
+                    {d}
+                  </option>
+                );
               })}
             </select>
           </div>
@@ -387,26 +441,44 @@ function RecurringPicker({ onScheduled, onCancel }) {
         {frequency === "yearly" && (
           <div className="flex gap-4">
             <div>
-              <div className="text-xs font-semibold text-chrome-500 dark:text-chrome-400 uppercase tracking-wider mb-1">Month</div>
+              <div className="text-xs font-semibold text-chrome-500 dark:text-chrome-400 uppercase tracking-wider mb-1">
+                Month
+              </div>
               <select
                 className="py-1 px-2 rounded-md bg-white dark:bg-chrome-800 border border-chrome-300 dark:border-chrome-900 cursor-pointer outline-none text-chrome-900 dark:text-chrome-50"
                 value={yearMonth}
-                onChange={function (e) { setYearMonth(parseInt(e.target.value)); }}
+                onChange={function (e) {
+                  setYearMonth(parseInt(e.target.value));
+                }}
               >
                 {monthNames.map(function (name, i) {
-                  return <option key={i} value={i}>{name}</option>;
+                  return (
+                    <option key={i} value={i}>
+                      {name}
+                    </option>
+                  );
                 })}
               </select>
             </div>
             <div>
-              <div className="text-xs font-semibold text-chrome-500 dark:text-chrome-400 uppercase tracking-wider mb-1">Day</div>
+              <div className="text-xs font-semibold text-chrome-500 dark:text-chrome-400 uppercase tracking-wider mb-1">
+                Day
+              </div>
               <select
                 className="py-1 px-2 rounded-md bg-white dark:bg-chrome-800 border border-chrome-300 dark:border-chrome-900 cursor-pointer outline-none text-chrome-900 dark:text-chrome-50"
                 value={yearDay}
-                onChange={function (e) { setYearDay(parseInt(e.target.value)); }}
+                onChange={function (e) {
+                  setYearDay(parseInt(e.target.value));
+                }}
               >
-                {Array.from({ length: 31 }, function (_, i) { return i + 1; }).map(function (d) {
-                  return <option key={d} value={d}>{d}</option>;
+                {Array.from({ length: 31 }, function (_, i) {
+                  return i + 1;
+                }).map(function (d) {
+                  return (
+                    <option key={d} value={d}>
+                      {d}
+                    </option>
+                  );
                 })}
               </select>
             </div>
@@ -414,7 +486,9 @@ function RecurringPicker({ onScheduled, onCancel }) {
         )}
 
         <div>
-          <div className="text-xs font-semibold text-chrome-500 dark:text-chrome-400 uppercase tracking-wider mb-1">Time</div>
+          <div className="text-xs font-semibold text-chrome-500 dark:text-chrome-400 uppercase tracking-wider mb-1">
+            Time
+          </div>
           <select
             className="py-1 px-2 rounded-md bg-white dark:bg-chrome-800 border border-chrome-300 dark:border-chrome-900 cursor-pointer outline-none text-chrome-900 dark:text-chrome-50"
             value={hour + ":" + minute}
@@ -425,7 +499,14 @@ function RecurringPicker({ onScheduled, onCancel }) {
             }}
           >
             {timeOptions.map(function (opt) {
-              return <option key={opt.hour + ":" + opt.minute} value={opt.hour + ":" + opt.minute}>{opt.label}</option>;
+              return (
+                <option
+                  key={opt.hour + ":" + opt.minute}
+                  value={opt.hour + ":" + opt.minute}
+                >
+                  {opt.label}
+                </option>
+              );
             })}
           </select>
         </div>
@@ -466,7 +547,12 @@ function Buttons({ onSelectDate, onSelectRecurring }) {
       <Button text="Next Week" Icon={IconBackpack} time="week"></Button>
       <Button text="In a month" Icon={IconMailbox} time="month"></Button>
       <Button text="Someday" Icon={IconBeach} time="someday"></Button>
-      <Button text="Repeatedly" Icon={IconRepeat} time="pick" onSelect={onSelectRecurring}></Button>
+      <Button
+        text="Repeatedly"
+        Icon={IconRepeat}
+        time="pick"
+        onSelect={onSelectRecurring}
+      ></Button>
       <Button
         text="Pick a Date"
         Icon={IconCalendar}

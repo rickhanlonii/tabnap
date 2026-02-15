@@ -208,13 +208,33 @@ function describeRecurPattern(pattern) {
     case "daily":
       return "Daily";
     case "weekly":
-      var days = (pattern.weekdays || [1]).map(function (d) { return dayNames[d]; });
+      var days = (pattern.weekdays || [1]).map(function (d) {
+        return dayNames[d];
+      });
       return "Every " + days.join(", ");
     case "monthly":
       return "Monthly on the " + ordinal(pattern.dayOfMonth || 1);
     case "yearly":
-      var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-      return "Yearly on " + monthNames[pattern.month || 0] + " " + (pattern.dayOfYear || 1);
+      var monthNames = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ];
+      return (
+        "Yearly on " +
+        monthNames[pattern.month || 0] +
+        " " +
+        (pattern.dayOfYear || 1)
+      );
     default:
       return "Recurring";
   }
@@ -511,7 +531,9 @@ function List({ tabs }) {
                       </div>
                       {tab.recurring && (
                         <div className="ml-2 text-xs px-1.5 py-0.5 rounded bg-accent-light dark:bg-accent-darkbg text-accent dark:text-accent-dark">
-                          {tab.recurPattern ? describeRecurPattern(tab.recurPattern) : "Daily"}
+                          {tab.recurPattern
+                            ? describeRecurPattern(tab.recurPattern)
+                            : "Daily"}
                         </div>
                       )}
                     </div>
@@ -652,8 +674,7 @@ function updateSettings(settings) {
 }
 
 function ColorPalettePicker({ settings }) {
-  var current =
-    settings.colorPalette != null ? settings.colorPalette : 0;
+  var current = settings.colorPalette != null ? settings.colorPalette : 0;
   return (
     <div className="flex items-center border-b border-chrome-300 dark:border-chrome-700 py-4">
       <div className="h-6 w-6 mr-6 -mt-1">
