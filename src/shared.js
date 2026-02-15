@@ -316,6 +316,22 @@ function getNextRecurrence(pattern) {
       }
       return candidate.getTime();
     }
+    case "weekly": {
+      var days = pattern.weekdays || [1]; // default Monday
+      var best = null;
+      for (var i = 0; i < days.length; i++) {
+        var day = days[i];
+        var daysUntil = (day - now.getDay() + 7) % 7;
+        var candidate = new Date(now.getFullYear(), now.getMonth(), now.getDate() + daysUntil, hour, minute, 0);
+        if (daysUntil === 0 && candidate.getTime() <= now.getTime()) {
+          candidate.setDate(candidate.getDate() + 7);
+        }
+        if (best === null || candidate.getTime() < best.getTime()) {
+          best = candidate;
+        }
+      }
+      return best.getTime();
+    }
     default:
       return Date.now() + 86400000; // fallback: 24h from now
   }
