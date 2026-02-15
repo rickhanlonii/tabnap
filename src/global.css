@@ -4,12 +4,12 @@
 
 :root {
   --grid-border: #dadce0;
-  --accent: #7C3AED;
-  --accent-hover: #6D28D9;
-  --accent-dark: #A78BFA;
-  --accent-light: #EDE9FE;
-  --accent-focus: #DDD6FE;
-  --accent-darkbg: #2E1065;
+  --accent: #7c3aed;
+  --accent-hover: #6d28d9;
+  --accent-dark: #a78bfa;
+  --accent-light: #ede9fe;
+  --accent-focus: #ddd6fe;
+  --accent-darkbg: #2e1065;
 }
 .dark {
   --grid-border: #3c4043;

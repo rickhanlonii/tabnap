@@ -1,19 +1,19 @@
 @import "tailwindcss";
 
 @theme {
-  --color-chrome-50: #F8F9FA;
-  --color-chrome-100: #F1F3F4;
-  --color-chrome-200: #E8EAED;
-  --color-chrome-300: #DADCE0;
-  --color-chrome-400: #BDC1C6;
-  --color-chrome-500: #9AA0A6;
-  --color-chrome-600: #80868B;
-  --color-chrome-700: #5F6368;
-  --color-chrome-800: #3C4043;
+  --color-chrome-50: #f8f9fa;
+  --color-chrome-100: #f1f3f4;
+  --color-chrome-200: #e8eaed;
+  --color-chrome-300: #dadce0;
+  --color-chrome-400: #bdc1c6;
+  --color-chrome-500: #9aa0a6;
+  --color-chrome-600: #80868b;
+  --color-chrome-700: #5f6368;
+  --color-chrome-800: #3c4043;
   --color-chrome-900: #202124;
-  --color-chrome-blue: #7C3AED;
-  --color-chrome-blue-hover: #6D28D9;
-  --color-chrome-blue-light: #EDE9FE;
+  --color-chrome-blue: #7c3aed;
+  --color-chrome-blue-hover: #6d28d9;
+  --color-chrome-blue-light: #ede9fe;
   --animate-tab-appear: tab-appear 0.5s ease-out;
   --animate-tab-close: tab-close 0.3s ease-in forwards;
   --animate-tab-open: tab-open 0.3s ease-out;

@@ -127,8 +127,8 @@ const SNOOZE_BUTTONS = [
   { label: "Next Week", icon: IconBackpack, hours: 168 },
   { label: "In a Month", icon: IconMailbox, hours: 720 },
   { label: "Someday", icon: IconBeach, hours: 2160 },
-  { label: "Repeatedly", icon: IconRepeat, hours: 24 },
-  { label: "Pick a Date", icon: IconCalendar, hours: 48 },
+  { label: "Repeatedly", icon: IconRepeat, hours: 0, action: "recurring" as const },
+  { label: "Pick a Date", icon: IconCalendar, hours: 0, action: "datepicker" as const },
 ];
 
 // ── Time helpers ───────────────────────────────────────────────────────────
@@ -387,7 +387,14 @@ function PopupDemo({
   onSnooze: (label: string, hours: number) => void;
   onBeginSwap: () => void;
   onCompleteSwap: () => void;
-  openTabs: { slotId: number; title: string; url: string; initial: string; color: string; skeleton: string }[];
+  openTabs: {
+    slotId: number;
+    title: string;
+    url: string;
+    initial: string;
+    color: string;
+    skeleton: string;
+  }[];
   activeIndex: number;
   onSelectTab: (index: number) => void;
 }) {
@@ -395,24 +402,31 @@ function PopupDemo({
   const [popupVisible, setPopupVisible] = useState(true);
   const [closingIndex, setClosingIndex] = useState<number | null>(null);
   const [openingIndex, setOpeningIndex] = useState<number | null>(null);
+  const [popupView, setPopupView] = useState<
+    "buttons" | "datepicker" | "recurring"
+  >("buttons");
   // During transition, show the next existing tab (not the new one at the end)
-  const nextActiveIndex = closingIndex !== null
-    ? (closingIndex < openTabs.length - 2 ? closingIndex + 1 : Math.max(0, closingIndex - 1))
-    : null;
-  const currentTab = nextActiveIndex !== null ? openTabs[nextActiveIndex] : openTabs[activeIndex];
+  const nextActiveIndex =
+    closingIndex !== null
+      ? closingIndex < openTabs.length - 2
+        ? closingIndex + 1
+        : Math.max(0, closingIndex - 1)
+      : null;
+  const currentTab =
+    nextActiveIndex !== null
+      ? openTabs[nextActiveIndex]
+      : openTabs[activeIndex];
 
-  function handleClick(label: string, hours: number) {
+  function doSnooze(label: string, hours: number, buttonLabel?: string) {
     if (activeBtn || !popupVisible || !currentTab) return;
-    setActiveBtn(label);
+    setActiveBtn(buttonLabel || label);
     onSnooze(label, hours);
-    // 1) Check animation plays for 1.2s
-    // 2) Close popup + collapse old tab + open new tab at end
-    // 3) Next existing tab becomes active, old tab removed
     setTimeout(() => {
       setPopupVisible(false);
+      setPopupView("buttons");
       setClosingIndex(activeIndex);
       onBeginSwap();
-      setOpeningIndex(openTabs.length); // new tab appended at end
+      setOpeningIndex(openTabs.length);
       setTimeout(() => {
         setActiveBtn(null);
         setClosingIndex(null);
@@ -421,6 +435,22 @@ function PopupDemo({
         setTimeout(() => setPopupVisible(true), 200);
       }, 350);
     }, 1200);
+  }
+
+  function handleClick(
+    label: string,
+    hours: number,
+    action?: "recurring" | "datepicker"
+  ) {
+    if (action === "recurring") {
+      setPopupView("recurring");
+      return;
+    }
+    if (action === "datepicker") {
+      setPopupView("datepicker");
+      return;
+    }
+    doSnooze(label, hours);
   }
 
   return (
@@ -439,29 +469,30 @@ function PopupDemo({
               {openTabs.map((tab, i) => {
                 const isClosing = closingIndex === i;
                 const isOpening = openingIndex === i;
-                const isActive = nextActiveIndex !== null
-                  ? i === nextActiveIndex
-                  : (i === activeIndex && !isClosing);
+                const isActive =
+                  nextActiveIndex !== null
+                    ? i === nextActiveIndex
+                    : i === activeIndex && !isClosing;
                 return (
-                <div
-                  key={tab.slotId}
-                  className={`flex items-center justify-center rounded-t-lg p-1.5 overflow-hidden ${
-                    isClosing
-                      ? "opacity-0 animate-tab-close"
-                      : isOpening
+                  <div
+                    key={tab.slotId}
+                    className={`flex items-center justify-center rounded-t-lg p-1.5 overflow-hidden ${
+                      isClosing
+                        ? "opacity-0 animate-tab-close"
+                        : isOpening
                         ? "animate-tab-open bg-chrome-100 cursor-pointer"
                         : isActive
-                          ? "bg-chrome-100 cursor-pointer"
-                          : "bg-chrome-300/50 hover:bg-chrome-300/80 cursor-pointer"
-                  }`}
-                  onClick={() => !isClosing && !isOpening && onSelectTab(i)}
-                >
-                  <div
-                    className={`w-4 h-4 rounded text-white text-[8px] font-bold flex items-center justify-center flex-shrink-0 ${tab.color}`}
+                        ? "bg-chrome-100 cursor-pointer"
+                        : "bg-chrome-300/50 hover:bg-chrome-300/80 cursor-pointer"
+                    }`}
+                    onClick={() => !isClosing && !isOpening && onSelectTab(i)}
                   >
-                    {tab.initial}
+                    <div
+                      className={`w-4 h-4 rounded text-white text-[8px] font-bold flex items-center justify-center flex-shrink-0 ${tab.color}`}
+                    >
+                      {tab.initial}
+                    </div>
                   </div>
-                </div>
                 );
               })}
             </div>
@@ -489,46 +520,437 @@ function PopupDemo({
         <div className="relative border-t border-chrome-200 bg-white flex-1 overflow-hidden">
           {currentTab && <PageSkeleton type={currentTab.skeleton} />}
           {/* Popup card, right-aligned under extension icon */}
-          <div className={`absolute right-3 top-2 w-60 sm:w-72 rounded-lg shadow-xl border border-chrome-200 bg-white overflow-hidden origin-top-right transition-all duration-200 ${
-            popupVisible ? "scale-100 opacity-100" : "scale-95 opacity-0"
-          }`}>
-            <div className="aspect-square grid grid-cols-3 grid-rows-3">
-              {SNOOZE_BUTTONS.map((btn, i) => {
-                const isActive = activeBtn === btn.label;
-                const Icon = btn.icon;
-                const isRight = (i + 1) % 3 !== 0;
-                const isBottom = i < 6;
-                return (
-                  <button
-                    key={btn.label}
-                    className={`flex flex-col items-center justify-center gap-1 transition-all duration-200 cursor-pointer ${
-                      isRight ? "border-r border-chrome-200" : ""
-                    } ${isBottom ? "border-b border-chrome-200" : ""} ${
-                      isActive
-                        ? "bg-violet-50 text-violet-600"
-                        : "bg-white text-chrome-600 hover:bg-chrome-50"
-                    }`}
-                    onClick={() => handleClick(btn.label, btn.hours)}
-                  >
-                    <div
-                      className={`w-8 h-8 transition-transform duration-200 ${
-                        isActive ? "scale-110" : ""
+          <div
+            className={`absolute right-3 top-2 w-60 sm:w-72 rounded-lg shadow-xl border border-chrome-200 bg-white overflow-hidden origin-top-right transition-all duration-200 ${
+              popupVisible ? "scale-100 opacity-100" : "scale-95 opacity-0"
+            }`}
+          >
+            {popupView === "buttons" && (
+              <div className="aspect-square grid grid-cols-3 grid-rows-3">
+                {SNOOZE_BUTTONS.map((btn, i) => {
+                  const isActive = activeBtn === btn.label;
+                  const Icon = btn.icon;
+                  const isRight = (i + 1) % 3 !== 0;
+                  const isBottom = i < 6;
+                  return (
+                    <button
+                      key={btn.label}
+                      className={`flex flex-col items-center justify-center gap-1 transition-all duration-200 cursor-pointer ${
+                        isRight ? "border-r border-chrome-200" : ""
+                      } ${isBottom ? "border-b border-chrome-200" : ""} ${
+                        isActive
+                          ? "bg-violet-50 text-violet-600"
+                          : "bg-white text-chrome-600 hover:bg-chrome-50"
                       }`}
+                      onClick={() =>
+                        handleClick(
+                          btn.label,
+                          btn.hours,
+                          (btn as { action?: "recurring" | "datepicker" })
+                            .action
+                        )
+                      }
                     >
-                      {isActive ? <IconCheck /> : <Icon />}
-                    </div>
-                    {!isActive && (
-                      <span className="text-xs font-medium">{btn.label}</span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
+                      <div
+                        className={`w-8 h-8 transition-transform duration-200 ${
+                          isActive ? "scale-110" : ""
+                        }`}
+                      >
+                        {isActive ? <IconCheck /> : <Icon />}
+                      </div>
+                      {!isActive && (
+                        <span className="text-xs font-medium">
+                          {btn.label}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+            {popupView === "datepicker" && (
+              <DemoDatePicker
+                onCancel={() => setPopupView("buttons")}
+                onSelect={(label, hours) => {
+                  setPopupView("buttons");
+                  requestAnimationFrame(() => doSnooze(label, hours, "Pick a Date"));
+                }}
+              />
+            )}
+            {popupView === "recurring" && (
+              <DemoRecurringPicker
+                onCancel={() => setPopupView("buttons")}
+                onSchedule={(label, hours) => {
+                  setPopupView("buttons");
+                  requestAnimationFrame(() => doSnooze(label, hours, "Repeatedly"));
+                }}
+              />
+            )}
           </div>
         </div>
       </div>
     </div>
   );
+}
+
+// ── Demo Date Picker (mini calendar inside popup card) ─────────────────────
+const DAYS_SHORT = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+const MONTH_NAMES_FULL = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+const MONTH_NAMES_SHORT = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
+function DemoDatePicker({
+  onCancel,
+  onSelect,
+}: {
+  onCancel: () => void;
+  onSelect: (label: string, hours: number) => void;
+}) {
+  const [viewDate, setViewDate] = useState(() => new Date());
+  const today = new Date();
+
+  const year = viewDate.getFullYear();
+  const month = viewDate.getMonth();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const firstDayOfWeek = new Date(year, month, 1).getDay();
+
+  const blanks = Array.from({ length: firstDayOfWeek }, (_, i) => i);
+  const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+
+  function isToday(d: number) {
+    return (
+      d === today.getDate() &&
+      month === today.getMonth() &&
+      year === today.getFullYear()
+    );
+  }
+
+  function isPast(d: number) {
+    const date = new Date(year, month, d);
+    return date < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  }
+
+  function handleDateClick(d: number) {
+    if (isPast(d)) return;
+    const target = new Date(year, month, d, 9, 0, 0);
+    const hoursFromNow = (target.getTime() - Date.now()) / (1000 * 60 * 60);
+    const label = `${MONTH_NAMES_SHORT[month]} ${d}`;
+    onSelect(label, Math.max(hoursFromNow, 0.1));
+  }
+
+  function prevMonth() {
+    setViewDate(new Date(year, month - 1, 1));
+  }
+  function nextMonth() {
+    setViewDate(new Date(year, month + 1, 1));
+  }
+
+  return (
+    <div className="aspect-square flex flex-col p-3">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center">
+          <button
+            className="p-0.5 rounded-full hover:bg-chrome-100 cursor-pointer"
+            onClick={onCancel}
+          >
+            <svg
+              className="w-4 h-4 text-chrome-500"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+          </button>
+          <span className="text-sm font-bold text-chrome-800 ml-1">
+            {MONTH_NAMES_FULL[month]}
+          </span>
+          <span className="text-sm text-chrome-500 ml-1">{year}</span>
+        </div>
+        <div className="flex gap-0.5">
+          <button
+            className="p-0.5 rounded-full hover:bg-chrome-100 cursor-pointer"
+            onClick={prevMonth}
+          >
+            <svg
+              className="w-4 h-4 text-chrome-500"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+          </button>
+          <button
+            className="p-0.5 rounded-full hover:bg-chrome-100 cursor-pointer"
+            onClick={nextMonth}
+          >
+            <svg
+              className="w-4 h-4 text-chrome-500"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+      {/* Day names */}
+      <div className="grid grid-cols-7 mb-1">
+        {DAYS_SHORT.map((d) => (
+          <div
+            key={d}
+            className="text-center text-[10px] font-medium text-chrome-500"
+          >
+            {d}
+          </div>
+        ))}
+      </div>
+      {/* Calendar grid */}
+      <div className="grid grid-cols-7 flex-1 content-start">
+        {blanks.map((b) => (
+          <div key={`b${b}`} />
+        ))}
+        {days.map((d) => (
+          <div
+            key={d}
+            className={`flex items-center justify-center text-xs rounded-full aspect-square cursor-pointer ${
+              isToday(d)
+                ? "ring-1 ring-violet-400 text-violet-600 font-bold"
+                : isPast(d)
+                  ? "text-chrome-300"
+                  : "text-chrome-700 hover:bg-chrome-100"
+            }`}
+            onClick={() => handleDateClick(d)}
+          >
+            {d}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Demo Recurring Picker ─────────────────────────────────────────────────
+const FREQ_OPTIONS = ["Daily", "Weekly", "Monthly"] as const;
+const DAY_LETTERS = ["S", "M", "T", "W", "T", "F", "S"];
+const DAY_NAMES_SHORT = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+function DemoRecurringPicker({
+  onCancel,
+  onSchedule,
+}: {
+  onCancel: () => void;
+  onSchedule: (label: string, hours: number) => void;
+}) {
+  const [frequency, setFrequency] = useState<
+    "Daily" | "Weekly" | "Monthly"
+  >("Daily");
+  const [weekdays, setWeekdays] = useState([1]); // Monday
+  const [dayOfMonth, setDayOfMonth] = useState(1);
+
+  function toggleWeekday(d: number) {
+    setWeekdays((prev) => {
+      if (prev.includes(d)) {
+        if (prev.length === 1) return prev;
+        return prev.filter((x) => x !== d);
+      }
+      return [...prev, d].sort();
+    });
+  }
+
+  function handleSchedule() {
+    let label: string;
+    let hours: number;
+    if (frequency === "Daily") {
+      label = "Daily at 9:00 AM";
+      hours = 24;
+    } else if (frequency === "Weekly") {
+      const dayStr = weekdays.map((d) => DAY_NAMES_SHORT[d]).join(", ");
+      label = `Every ${dayStr} at 9:00 AM`;
+      // Hours until next matching weekday
+      const now = new Date();
+      const todayDay = now.getDay();
+      const sorted = [...weekdays].sort();
+      let daysUntil = 7;
+      for (const d of sorted) {
+        const diff = (d - todayDay + 7) % 7;
+        if (diff > 0 && diff < daysUntil) daysUntil = diff;
+      }
+      if (daysUntil === 7) daysUntil = 7; // wrap to next week
+      hours = daysUntil * 24;
+    } else {
+      label = `Monthly on the ${dayOfMonth}${ordinalSuffix(dayOfMonth)}`;
+      hours = 30 * 24; // ~1 month
+    }
+    onSchedule(label, hours);
+  }
+
+  return (
+    <div className="aspect-square flex flex-col p-3">
+      {/* Header */}
+      <div className="flex items-center mb-3">
+        <button
+          className="p-0.5 rounded-full hover:bg-chrome-100 cursor-pointer"
+          onClick={onCancel}
+        >
+          <svg
+            className="w-4 h-4 text-chrome-500"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+        </button>
+        <span className="text-sm font-bold text-chrome-800 ml-1">
+          Repeat Schedule
+        </span>
+      </div>
+
+      <div className="flex-1 space-y-3">
+        {/* Frequency */}
+        <div>
+          <div className="text-[10px] font-semibold text-chrome-400 uppercase tracking-wider mb-1">
+            Frequency
+          </div>
+          <div className="flex gap-1">
+            {FREQ_OPTIONS.map((f) => (
+              <button
+                key={f}
+                className={`px-2.5 py-1 rounded-full text-xs cursor-pointer border transition-colors ${
+                  frequency === f
+                    ? "border-violet-300 bg-violet-50 text-violet-600"
+                    : "border-chrome-200 text-chrome-600 hover:border-chrome-300"
+                }`}
+                onClick={() => setFrequency(f)}
+              >
+                {f}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Weekly: day toggles */}
+        {frequency === "Weekly" && (
+          <div>
+            <div className="text-[10px] font-semibold text-chrome-400 uppercase tracking-wider mb-1">
+              Days
+            </div>
+            <div className="flex gap-1">
+              {DAY_LETTERS.map((letter, i) => {
+                const active = weekdays.includes(i);
+                return (
+                  <button
+                    key={i}
+                    className={`w-7 h-7 rounded-full flex items-center justify-center text-xs cursor-pointer border transition-colors ${
+                      active
+                        ? "border-violet-300 bg-violet-50 text-violet-600"
+                        : "border-chrome-200 text-chrome-600 hover:border-chrome-300"
+                    }`}
+                    onClick={() => toggleWeekday(i)}
+                  >
+                    {letter}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Monthly: day of month */}
+        {frequency === "Monthly" && (
+          <div>
+            <div className="text-[10px] font-semibold text-chrome-400 uppercase tracking-wider mb-1">
+              Day of month
+            </div>
+            <select
+              className="py-1 px-2 rounded-md bg-white border border-chrome-200 cursor-pointer outline-none text-xs text-chrome-700"
+              value={dayOfMonth}
+              onChange={(e) => setDayOfMonth(parseInt(e.target.value))}
+            >
+              {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
+                <option key={d} value={d}>
+                  {d}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {/* Time (fixed display) */}
+        <div>
+          <div className="text-[10px] font-semibold text-chrome-400 uppercase tracking-wider mb-1">
+            Time
+          </div>
+          <div className="py-1 px-2 rounded-md bg-chrome-50 border border-chrome-200 text-xs text-chrome-700 w-fit">
+            9:00 AM
+          </div>
+        </div>
+      </div>
+
+      {/* Schedule button */}
+      <button
+        className="w-full mt-2 py-1.5 rounded-lg bg-violet-500 text-white text-xs font-medium hover:bg-violet-600 cursor-pointer"
+        onClick={handleSchedule}
+      >
+        Schedule
+      </button>
+    </div>
+  );
+}
+
+function ordinalSuffix(n: number): string {
+  const s = ["th", "st", "nd", "rd"];
+  const v = n % 100;
+  return s[(v - 20) % 10] || s[v] || s[0];
 }
 
 function PageSkeleton({ type }: { type: string }) {
@@ -580,7 +1002,12 @@ function PageSkeleton({ type }: { type: string }) {
         <div className="flex h-full">
           <div className="w-1/4 border-r border-chrome-100 p-3 space-y-2">
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className={`h-2 ${b} ${i === 2 ? "bg-sky-100 w-full" : `w-${i % 2 ? "3/4" : "full"}`}`} />
+              <div
+                key={i}
+                className={`h-2 ${b} ${
+                  i === 2 ? "bg-sky-100 w-full" : `w-${i % 2 ? "3/4" : "full"}`
+                }`}
+              />
             ))}
           </div>
           <div className="flex-1 p-4 space-y-2.5">
@@ -612,7 +1039,10 @@ function PageSkeleton({ type }: { type: string }) {
           {[1, 2, 3, 4, 5].map((i) => (
             <div key={i} className="flex items-baseline gap-2 py-1.5">
               <div className={`w-4 h-3 ${b} flex-shrink-0 opacity-60`} />
-              <div className={`h-2.5 ${b} flex-1`} style={{ maxWidth: `${50 + (i * 17) % 40}%` }} />
+              <div
+                className={`h-2.5 ${b} flex-1`}
+                style={{ maxWidth: `${50 + ((i * 17) % 40)}%` }}
+              />
             </div>
           ))}
         </div>
@@ -670,15 +1100,39 @@ function NavButtons() {
   return (
     <div className="flex items-center gap-1 flex-shrink-0 text-chrome-400">
       {/* Back */}
-      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <svg
+        className="w-4 h-4"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
         <path d="M15 18l-6-6 6-6" />
       </svg>
       {/* Forward */}
-      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <svg
+        className="w-4 h-4"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
         <path d="M9 18l6-6-6-6" />
       </svg>
       {/* Refresh */}
-      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <svg
+        className="w-4 h-4"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
         <path d="M23 4v6h-6" />
         <path d="M1 20v-6h6" />
         <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />

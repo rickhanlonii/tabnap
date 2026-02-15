@@ -3,7 +3,12 @@ export function Hero() {
     <section className="relative overflow-hidden bg-white pt-24 pb-16 sm:pt-32 sm:pb-24">
       <div className="mx-auto max-w-4xl px-6 text-center">
         <div className="mb-8 flex justify-center">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" className="h-20 w-20 text-violet-500" aria-label="TabNap icon">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 512 512"
+            className="h-20 w-20 text-violet-500"
+            aria-label="TabNap icon"
+          >
             <path
               d="M320 32L304 0l-16 32-32 16 32 16 16 32 16-32 32-16zm138.7 149.3L432 128l-26.7 53.3L352 208l53.3 26.7L432 288l26.7-53.3L512 208z"
               fill="currentColor"

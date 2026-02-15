@@ -202,18 +202,24 @@ function getHistoryTimeLabel(timestamp) {
   return monthShort + " " + date.getDate() + ", " + date.getFullYear();
 }
 
+function formatPatternTime(pattern) {
+  var d = new Date(2024, 0, 1, pattern.hour || 9, pattern.minute || 0);
+  return d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+}
+
 function describeRecurPattern(pattern) {
   var dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  var time = formatPatternTime(pattern);
   switch (pattern.frequency) {
     case "daily":
-      return "Daily";
+      return "Daily at " + time;
     case "weekly":
       var days = (pattern.weekdays || [1]).map(function (d) {
         return dayNames[d];
       });
-      return "Every " + days.join(", ");
+      return "Every " + days.join(", ") + " at " + time;
     case "monthly":
-      return "Monthly on the " + ordinal(pattern.dayOfMonth || 1);
+      return "Monthly on the " + ordinal(pattern.dayOfMonth || 1) + " at " + time;
     case "yearly":
       var monthNames = [
         "Jan",
@@ -233,7 +239,9 @@ function describeRecurPattern(pattern) {
         "Yearly on " +
         monthNames[pattern.month || 0] +
         " " +
-        (pattern.dayOfYear || 1)
+        (pattern.dayOfYear || 1) +
+        " at " +
+        time
       );
     default:
       return "Recurring";
