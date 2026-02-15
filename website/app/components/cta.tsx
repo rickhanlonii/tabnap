@@ -13,7 +13,7 @@ export function CTA() {
           {/* TODO: Replace # with actual Chrome Web Store URL */}
           <a
             href="#"
-            className="rounded-lg bg-chrome-blue px-8 py-4 text-lg font-semibold text-white shadow-sm hover:bg-chrome-blue-hover transition-colors inline-block"
+            className="rounded-lg bg-violet-500 px-8 py-4 text-lg font-semibold text-white shadow-sm hover:bg-violet-600 transition-colors inline-block"
           >
             Add to Chrome — It&apos;s Free
           </a>

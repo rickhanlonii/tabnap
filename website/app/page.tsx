@@ -1,5 +1,5 @@
 import { Hero } from "./components/hero";
-import { Screenshots } from "./components/screenshots";
+import { InteractiveDemo } from "./components/interactive-demo";
 import { Features } from "./components/features";
 import { Comparison } from "./components/comparison";
 import { CTA } from "./components/cta";
@@ -9,7 +9,7 @@ export default function Home() {
   return (
     <main>
       <Hero />
-      <Screenshots />
+      <InteractiveDemo />
       <Features />
       <Comparison />
       <CTA />
