@@ -606,7 +606,7 @@ function IconCheck({ className }) {
     </svg>
   );
 }
-function sendTabToNapTime(label, when, recurring) {
+function sendTabToNapTime(label, when, recurring, recurPattern) {
   let queryOptions = { active: true, currentWindow: true };
   let tab;
 
@@ -630,6 +630,9 @@ function sendTabToNapTime(label, when, recurring) {
       };
       if (recurring) {
         tabInfo.recurring = true;
+      }
+      if (recurPattern) {
+        tabInfo.recurPattern = recurPattern;
       }
       result.tabs.push(tabInfo);
       const sortedByWhenIncreasing = result.tabs.sort((a, b) => {
