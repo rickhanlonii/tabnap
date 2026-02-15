@@ -13,6 +13,7 @@
 ### Task 1: Scaffold Next.js project
 
 **Files:**
+
 - Create: `website/` (via create-next-app)
 - Modify: `website/tailwind.config.ts` (add chrome palette)
 - Modify: `website/app/layout.tsx` (metadata)
@@ -58,19 +59,19 @@ Next.js 15 with Tailwind 4 uses CSS-based config (`app/globals.css`) instead of 
 
 ```css
 @theme {
-  --color-chrome-50: #F8F9FA;
-  --color-chrome-100: #F1F3F4;
-  --color-chrome-200: #E8EAED;
-  --color-chrome-300: #DADCE0;
-  --color-chrome-400: #BDC1C6;
-  --color-chrome-500: #9AA0A6;
-  --color-chrome-600: #80868B;
-  --color-chrome-700: #5F6368;
-  --color-chrome-800: #3C4043;
+  --color-chrome-50: #f8f9fa;
+  --color-chrome-100: #f1f3f4;
+  --color-chrome-200: #e8eaed;
+  --color-chrome-300: #dadce0;
+  --color-chrome-400: #bdc1c6;
+  --color-chrome-500: #9aa0a6;
+  --color-chrome-600: #80868b;
+  --color-chrome-700: #5f6368;
+  --color-chrome-800: #3c4043;
   --color-chrome-900: #202124;
-  --color-chrome-blue: #1A73E8;
-  --color-chrome-blue-hover: #1967D2;
-  --color-chrome-blue-light: #E8F0FE;
+  --color-chrome-blue: #1a73e8;
+  --color-chrome-blue-hover: #1967d2;
+  --color-chrome-blue-light: #e8f0fe;
 }
 ```
 
@@ -105,6 +106,7 @@ cd /Users/ricky/oss/tabnap && git add website && git commit -m "feat(website): s
 ### Task 2: SEO metadata and Open Graph tags
 
 **Files:**
+
 - Modify: `website/app/layout.tsx`
 - Create: `website/public/og-image.png` (placeholder — copy existing `tabnap_large.png`)
 
@@ -219,6 +221,7 @@ cd /Users/ricky/oss/tabnap && git add website/app/layout.tsx website/public/icon
 ### Task 3: Hero section component
 
 **Files:**
+
 - Create: `website/app/components/hero.tsx`
 - Modify: `website/app/page.tsx`
 
@@ -304,6 +307,7 @@ cd /Users/ricky/oss/tabnap && git add website/app/components/hero.tsx website/ap
 ### Task 4: Screenshot showcase section
 
 **Files:**
+
 - Create: `website/app/components/screenshots.tsx`
 - Create: `website/public/screenshots/.gitkeep`
 - Modify: `website/app/page.tsx`
@@ -440,6 +444,7 @@ cd /Users/ricky/oss/tabnap && git add website/app/components/screenshots.tsx web
 ### Task 5: Features section
 
 **Files:**
+
 - Create: `website/app/components/features.tsx`
 - Modify: `website/app/page.tsx`
 
@@ -500,7 +505,10 @@ export function Features() {
         </p>
         <div className="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((feature) => (
-            <div key={feature.title} className="rounded-xl border border-chrome-200 p-6">
+            <div
+              key={feature.title}
+              className="rounded-xl border border-chrome-200 p-6"
+            >
               <div className="text-3xl">{feature.icon}</div>
               <h3 className="mt-3 text-lg font-semibold text-chrome-900">
                 {feature.title}
@@ -558,6 +566,7 @@ cd /Users/ricky/oss/tabnap && git add website/app/components/features.tsx websit
 ### Task 6: Comparison section (vs competitors)
 
 **Files:**
+
 - Create: `website/app/components/comparison.tsx`
 - Modify: `website/app/page.tsx`
 
@@ -678,6 +687,7 @@ cd /Users/ricky/oss/tabnap && git add website/app/components/comparison.tsx webs
 ### Task 7: CTA section and footer
 
 **Files:**
+
 - Create: `website/app/components/cta.tsx`
 - Create: `website/app/components/footer.tsx`
 - Modify: `website/app/page.tsx`
@@ -695,8 +705,8 @@ export function CTA() {
           Ready to snooze some tabs?
         </h2>
         <p className="mt-4 text-lg text-chrome-400">
-          Install TabNap in seconds. No account needed, no data collected,
-          works offline.
+          Install TabNap in seconds. No account needed, no data collected, works
+          offline.
         </p>
         <div className="mt-8">
           {/* TODO: Replace # with actual Chrome Web Store URL */}
@@ -724,21 +734,17 @@ export function Footer() {
       <div className="mx-auto max-w-6xl px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-2 text-chrome-400">
           <img src="/icon.png" alt="TabNap" className="h-5 w-5" />
-          <span className="text-sm">TabNap — Give your tabs a little nap, as a treat.</span>
+          <span className="text-sm">
+            TabNap — Give your tabs a little nap, as a treat.
+          </span>
         </div>
         <div className="flex gap-6 text-sm text-chrome-500">
           {/* TODO: Replace # with actual GitHub URL */}
-          <a
-            href="#"
-            className="hover:text-chrome-300 transition-colors"
-          >
+          <a href="#" className="hover:text-chrome-300 transition-colors">
             GitHub
           </a>
           {/* TODO: Replace # with actual Chrome Web Store URL */}
-          <a
-            href="#"
-            className="hover:text-chrome-300 transition-colors"
-          >
+          <a href="#" className="hover:text-chrome-300 transition-colors">
             Chrome Web Store
           </a>
         </div>
@@ -795,6 +801,7 @@ cd /Users/ricky/oss/tabnap && git add website/app/components/cta.tsx website/app
 ### Task 8: Final build verification and cleanup
 
 **Files:**
+
 - Modify: `website/app/globals.css` (remove any unused boilerplate styles)
 - Verify: `website/out/` (static export)
 
@@ -806,19 +813,19 @@ Open `website/app/globals.css` and remove any default Next.js body styles (thing
 @import "tailwindcss";
 
 @theme {
-  --color-chrome-50: #F8F9FA;
-  --color-chrome-100: #F1F3F4;
-  --color-chrome-200: #E8EAED;
-  --color-chrome-300: #DADCE0;
-  --color-chrome-400: #BDC1C6;
-  --color-chrome-500: #9AA0A6;
-  --color-chrome-600: #80868B;
-  --color-chrome-700: #5F6368;
-  --color-chrome-800: #3C4043;
+  --color-chrome-50: #f8f9fa;
+  --color-chrome-100: #f1f3f4;
+  --color-chrome-200: #e8eaed;
+  --color-chrome-300: #dadce0;
+  --color-chrome-400: #bdc1c6;
+  --color-chrome-500: #9aa0a6;
+  --color-chrome-600: #80868b;
+  --color-chrome-700: #5f6368;
+  --color-chrome-800: #3c4043;
   --color-chrome-900: #202124;
-  --color-chrome-blue: #1A73E8;
-  --color-chrome-blue-hover: #1967D2;
-  --color-chrome-blue-light: #E8F0FE;
+  --color-chrome-blue: #1a73e8;
+  --color-chrome-blue-hover: #1967d2;
+  --color-chrome-blue-light: #e8f0fe;
 }
 ```
 
@@ -870,12 +877,12 @@ cd /Users/ricky/oss/tabnap && git add website && git commit -m "feat(website): f
 
 When you're ready to create real screenshots, replace the placeholder divs in `screenshots.tsx` with `<img>` tags. Here's what to capture:
 
-| File | What to capture | Tips |
-|------|----------------|------|
-| `popup-grid.png` | The 3x3 popup button grid | Open popup on a real webpage. Capture just the popup window (800x800px). Light theme. |
+| File               | What to capture                | Tips                                                                                                                  |
+| ------------------ | ------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
+| `popup-grid.png`   | The 3x3 popup button grid      | Open popup on a real webpage. Capture just the popup window (800x800px). Light theme.                                 |
 | `snoozed-list.png` | Full-page tab list with groups | Add 5-8 snoozed tabs spanning Today/Tomorrow/This Week. Hover one tab to show action icons. Light theme. (1200x800px) |
-| `date-picker.png` | Calendar date picker in popup | Click "Pick a Date" in popup. Show a month with selectable dates. (800x800px) |
-| `dark-mode.png` | Full-page list in dark mode | Same as snoozed-list but with dark theme active. (1200x800px) |
+| `date-picker.png`  | Calendar date picker in popup  | Click "Pick a Date" in popup. Show a month with selectable dates. (800x800px)                                         |
+| `dark-mode.png`    | Full-page list in dark mode    | Same as snoozed-list but with dark theme active. (1200x800px)                                                         |
 
 To swap placeholders for real images, change `ScreenshotPlaceholder` in `screenshots.tsx` to render:
 

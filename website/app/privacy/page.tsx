@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Privacy Policy — TabNap",
-  description: "TabNap privacy policy. No data collection, no tracking, no accounts.",
+  description:
+    "TabNap privacy policy. No data collection, no tracking, no accounts.",
 };
 
 export default function PrivacyPolicy() {
@@ -20,8 +21,9 @@ export default function PrivacyPolicy() {
           <h2 className="text-xl font-semibold text-chrome-900">Overview</h2>
           <p className="mt-2">
             TabNap is a browser extension that snoozes tabs — it closes them now
-            and reopens them later at a time you choose. TabNap does not collect,
-            transmit, or share any personal data. All data stays on your device.
+            and reopens them later at a time you choose. TabNap does not
+            collect, transmit, or share any personal data. All data stays on
+            your device.
           </p>
         </section>
 
@@ -37,9 +39,15 @@ export default function PrivacyPolicy() {
             :
           </p>
           <ul className="mt-2 list-disc pl-6 space-y-1">
-            <li>Snoozed tab information (page title, URL, favicon URL, scheduled wake-up time)</li>
+            <li>
+              Snoozed tab information (page title, URL, favicon URL, scheduled
+              wake-up time)
+            </li>
             <li>History of previously woken tabs</li>
-            <li>Your settings and preferences (snooze times, theme, sound and notification toggles)</li>
+            <li>
+              Your settings and preferences (snooze times, theme, sound and
+              notification toggles)
+            </li>
           </ul>
           <p className="mt-2">
             This data never leaves your browser. It is not sent to any server,
@@ -68,30 +76,30 @@ export default function PrivacyPolicy() {
             Network requests
           </h2>
           <p className="mt-2">
-            TabNap makes no network requests. It operates entirely offline. There
-            are no external servers, no APIs, and no remote endpoints of any kind.
+            TabNap makes no network requests. It operates entirely offline.
+            There are no external servers, no APIs, and no remote endpoints of
+            any kind.
           </p>
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold text-chrome-900">
-            Permissions
-          </h2>
+          <h2 className="text-xl font-semibold text-chrome-900">Permissions</h2>
           <p className="mt-2">
             TabNap requests the following browser permissions, each used solely
             for its core functionality:
           </p>
           <ul className="mt-2 list-disc pl-6 space-y-1">
             <li>
-              <strong>alarms</strong> — Schedule tab wake-ups at the correct time
+              <strong>alarms</strong> — Schedule tab wake-ups at the correct
+              time
             </li>
             <li>
               <strong>tabs</strong> — Close the current tab when snoozing and
               reopen tabs when they wake up
             </li>
             <li>
-              <strong>storage</strong> — Save snoozed tabs, history, and settings
-              locally
+              <strong>storage</strong> — Save snoozed tabs, history, and
+              settings locally
             </li>
             <li>
               <strong>idle</strong> — Detect when you return to your computer so
@@ -114,20 +122,21 @@ export default function PrivacyPolicy() {
           </h2>
           <p className="mt-2">
             TabNap does not integrate with, send data to, or receive data from
-            any third-party services. There are no ads, no analytics SDKs, and no
-            embedded third-party content.
+            any third-party services. There are no ads, no analytics SDKs, and
+            no embedded third-party content.
           </p>
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold text-chrome-900">
-            Open source
-          </h2>
+          <h2 className="text-xl font-semibold text-chrome-900">Open source</h2>
           <p className="mt-2">
-            TabNap is open source. You can inspect the full source code to verify
-            these claims. The code is available on{" "}
+            TabNap is open source. You can inspect the full source code to
+            verify these claims. The code is available on{" "}
             {/* TODO: Replace # with actual GitHub URL */}
-            <a href="#" className="text-chrome-blue hover:text-chrome-blue-hover underline">
+            <a
+              href="#"
+              className="text-chrome-blue hover:text-chrome-blue-hover underline"
+            >
               GitHub
             </a>
             .
@@ -139,8 +148,8 @@ export default function PrivacyPolicy() {
             Changes to this policy
           </h2>
           <p className="mt-2">
-            If this policy is updated, the changes will be reflected on this page
-            with an updated date. Since TabNap collects no data, meaningful
+            If this policy is updated, the changes will be reflected on this
+            page with an updated date. Since TabNap collects no data, meaningful
             changes to this policy are unlikely.
           </p>
         </section>
@@ -148,9 +157,12 @@ export default function PrivacyPolicy() {
         <section>
           <h2 className="text-xl font-semibold text-chrome-900">Contact</h2>
           <p className="mt-2">
-            If you have questions about this privacy policy, open an issue on the{" "}
-            {/* TODO: Replace # with actual GitHub URL */}
-            <a href="#" className="text-chrome-blue hover:text-chrome-blue-hover underline">
+            If you have questions about this privacy policy, open an issue on
+            the {/* TODO: Replace # with actual GitHub URL */}
+            <a
+              href="#"
+              className="text-chrome-blue hover:text-chrome-blue-hover underline"
+            >
               GitHub repository
             </a>
             .

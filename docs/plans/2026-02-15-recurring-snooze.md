@@ -13,11 +13,13 @@
 ## Storage Schema Change
 
 Current recurring tab object:
+
 ```js
 { title, label, when, url, favicon, snoozedAt, recurring: true }
 ```
 
 New recurring tab object:
+
 ```js
 {
   title, label, when, url, favicon, snoozedAt,
@@ -41,6 +43,7 @@ The `when` field is always set to the next computed occurrence (used by the alar
 ### Task 1: Add `getNextRecurrence()` to shared.js — daily
 
 **Files:**
+
 - Modify: `src/shared.js` (add function before the `if (typeof jest` block)
 - Test: `page.test.js` (add new describe block)
 
@@ -100,7 +103,14 @@ function getNextRecurrence(pattern) {
 
   switch (pattern.frequency) {
     case "daily": {
-      var candidate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minute, 0);
+      var candidate = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        hour,
+        minute,
+        0
+      );
       if (candidate.getTime() <= now.getTime()) {
         candidate.setDate(candidate.getDate() + 1);
       }
@@ -131,6 +141,7 @@ git commit -m "feat: add getNextRecurrence() with daily pattern support"
 ### Task 2: Add weekly recurrence to `getNextRecurrence()`
 
 **Files:**
+
 - Modify: `src/shared.js` (extend switch case)
 - Test: `page.test.js` (add weekly tests)
 
@@ -172,7 +183,12 @@ describe("weekly", () => {
     jest.useFakeTimers("modern");
     // Jan 15, 2024 is Monday, 10am — Mon already passed
     jest.setSystemTime(new Date(2024, 0, 15, 10, 0, 0));
-    const pattern = { frequency: "weekly", hour: 9, minute: 0, weekdays: [1, 5] }; // Mon, Fri
+    const pattern = {
+      frequency: "weekly",
+      hour: 9,
+      minute: 0,
+      weekdays: [1, 5],
+    }; // Mon, Fri
     const result = new Date(getNextRecurrence(pattern));
     expect(result).toBeDate(2024, 0, 19, 9, 0, 0); // Friday
     jest.useRealTimers();
@@ -235,6 +251,7 @@ git commit -m "feat: add weekly recurrence pattern to getNextRecurrence"
 ### Task 3: Add monthly recurrence to `getNextRecurrence()`
 
 **Files:**
+
 - Modify: `src/shared.js`
 - Test: `page.test.js`
 
@@ -245,7 +262,12 @@ describe("monthly", () => {
   test("returns this month if day/time have not passed", () => {
     jest.useFakeTimers("modern");
     jest.setSystemTime(new Date(2024, 0, 10, 7, 0, 0)); // Jan 10
-    const pattern = { frequency: "monthly", hour: 9, minute: 0, dayOfMonth: 15 };
+    const pattern = {
+      frequency: "monthly",
+      hour: 9,
+      minute: 0,
+      dayOfMonth: 15,
+    };
     const result = new Date(getNextRecurrence(pattern));
     expect(result).toBeDate(2024, 0, 15, 9, 0, 0);
     jest.useRealTimers();
@@ -254,7 +276,12 @@ describe("monthly", () => {
   test("returns next month if day has passed", () => {
     jest.useFakeTimers("modern");
     jest.setSystemTime(new Date(2024, 0, 20, 10, 0, 0)); // Jan 20
-    const pattern = { frequency: "monthly", hour: 9, minute: 0, dayOfMonth: 15 };
+    const pattern = {
+      frequency: "monthly",
+      hour: 9,
+      minute: 0,
+      dayOfMonth: 15,
+    };
     const result = new Date(getNextRecurrence(pattern));
     expect(result).toBeDate(2024, 1, 15, 9, 0, 0); // Feb 15
     jest.useRealTimers();
@@ -263,7 +290,12 @@ describe("monthly", () => {
   test("returns next month if same day but time has passed", () => {
     jest.useFakeTimers("modern");
     jest.setSystemTime(new Date(2024, 0, 15, 10, 0, 0)); // Jan 15, 10am
-    const pattern = { frequency: "monthly", hour: 9, minute: 0, dayOfMonth: 15 };
+    const pattern = {
+      frequency: "monthly",
+      hour: 9,
+      minute: 0,
+      dayOfMonth: 15,
+    };
     const result = new Date(getNextRecurrence(pattern));
     expect(result).toBeDate(2024, 1, 15, 9, 0, 0);
     jest.useRealTimers();
@@ -272,7 +304,12 @@ describe("monthly", () => {
   test("handles day 31 in month with fewer days (clamps to last day)", () => {
     jest.useFakeTimers("modern");
     jest.setSystemTime(new Date(2024, 1, 1, 7, 0, 0)); // Feb 1 (leap year)
-    const pattern = { frequency: "monthly", hour: 9, minute: 0, dayOfMonth: 31 };
+    const pattern = {
+      frequency: "monthly",
+      hour: 9,
+      minute: 0,
+      dayOfMonth: 31,
+    };
     const result = new Date(getNextRecurrence(pattern));
     // Feb has 29 days in 2024. Date constructor handles overflow by rolling to next month.
     // We want to clamp: Feb 29 at 9am.
@@ -320,6 +357,7 @@ git commit -m "feat: add monthly recurrence pattern to getNextRecurrence"
 ### Task 4: Add yearly recurrence to `getNextRecurrence()`
 
 **Files:**
+
 - Modify: `src/shared.js`
 - Test: `page.test.js`
 
@@ -330,7 +368,13 @@ describe("yearly", () => {
   test("returns this year if date/time have not passed", () => {
     jest.useFakeTimers("modern");
     jest.setSystemTime(new Date(2024, 0, 1, 7, 0, 0)); // Jan 1
-    const pattern = { frequency: "yearly", hour: 9, minute: 0, month: 5, dayOfYear: 15 }; // Jun 15
+    const pattern = {
+      frequency: "yearly",
+      hour: 9,
+      minute: 0,
+      month: 5,
+      dayOfYear: 15,
+    }; // Jun 15
     const result = new Date(getNextRecurrence(pattern));
     expect(result).toBeDate(2024, 5, 15, 9, 0, 0);
     jest.useRealTimers();
@@ -339,7 +383,13 @@ describe("yearly", () => {
   test("returns next year if date has passed", () => {
     jest.useFakeTimers("modern");
     jest.setSystemTime(new Date(2024, 6, 1, 10, 0, 0)); // Jul 1
-    const pattern = { frequency: "yearly", hour: 9, minute: 0, month: 5, dayOfYear: 15 }; // Jun 15
+    const pattern = {
+      frequency: "yearly",
+      hour: 9,
+      minute: 0,
+      month: 5,
+      dayOfYear: 15,
+    }; // Jun 15
     const result = new Date(getNextRecurrence(pattern));
     expect(result).toBeDate(2025, 5, 15, 9, 0, 0);
     jest.useRealTimers();
@@ -348,7 +398,13 @@ describe("yearly", () => {
   test("returns next year if same date but time has passed", () => {
     jest.useFakeTimers("modern");
     jest.setSystemTime(new Date(2024, 5, 15, 10, 0, 0)); // Jun 15, 10am
-    const pattern = { frequency: "yearly", hour: 9, minute: 0, month: 5, dayOfYear: 15 };
+    const pattern = {
+      frequency: "yearly",
+      hour: 9,
+      minute: 0,
+      month: 5,
+      dayOfYear: 15,
+    };
     const result = new Date(getNextRecurrence(pattern));
     expect(result).toBeDate(2025, 5, 15, 9, 0, 0);
     jest.useRealTimers();
@@ -392,6 +448,7 @@ git commit -m "feat: add yearly recurrence pattern to getNextRecurrence"
 ### Task 5: Update background.js to use `getNextRecurrence`
 
 **Files:**
+
 - Modify: `src/background.js` (the recurring block inside `checkTabs`)
 - Test: `background.test.js`
 
@@ -476,6 +533,7 @@ if (typeof importScripts !== "undefined") {
 Then replace the recurring block in `checkTabs()` (lines 91-96):
 
 **Old:**
+
 ```js
 if (tab.recurring) {
   const tomorrow = new Date();
@@ -486,6 +544,7 @@ if (tab.recurring) {
 ```
 
 **New:**
+
 ```js
 if (tab.recurring) {
   var nextWhen;
@@ -523,6 +582,7 @@ git commit -m "feat: use recurPattern for recurring tab rescheduling in backgrou
 ### Task 6: Build the recurring configuration popup UI
 
 **Files:**
+
 - Modify: `src/popup.js` (add `RecurringPicker` component, new route)
 
 This is the largest UI task. When the user clicks "Repeatedly", instead of immediately snoozing, we show a configuration screen in the popup (similar to how "Pick a Date" shows the `DatePicker`).
@@ -579,8 +639,18 @@ function Buttons({ onSelectDate, onSelectRecurring }) {
   return (
     <div className="...">
       {/* ... other buttons unchanged ... */}
-      <Button text="Repeatedly" Icon={IconRepeat} time="pick" onSelect={onSelectRecurring}></Button>
-      <Button text="Pick a Date" Icon={IconCalendar} time="pick" onSelect={onSelectDate}></Button>
+      <Button
+        text="Repeatedly"
+        Icon={IconRepeat}
+        time="pick"
+        onSelect={onSelectRecurring}
+      ></Button>
+      <Button
+        text="Pick a Date"
+        Icon={IconCalendar}
+        time="pick"
+        onSelect={onSelectDate}
+      ></Button>
     </div>
   );
 }
@@ -625,7 +695,9 @@ function RecurringPicker({ onScheduled, onCancel }) {
     setWeekdays(function (prev) {
       if (prev.includes(day)) {
         if (prev.length === 1) return prev; // must keep at least 1
-        return prev.filter(function (d) { return d !== day; });
+        return prev.filter(function (d) {
+          return d !== day;
+        });
       }
       return prev.concat(day).sort();
     });
@@ -635,13 +707,29 @@ function RecurringPicker({ onScheduled, onCancel }) {
   for (var h = 0; h < 24; h++) {
     for (var m = 0; m < 60; m += 15) {
       var d = new Date(2024, 0, 1, h, m);
-      var label = d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+      var label = d.toLocaleTimeString([], {
+        hour: "numeric",
+        minute: "2-digit",
+      });
       timeOptions.push({ hour: h, minute: m, label: label });
     }
   }
 
   var dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  var monthNames = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
 
   return (
     <div className="bg-white dark:bg-chrome-900 p-4 w-96 h-96 flex flex-col">
@@ -651,25 +739,44 @@ function RecurringPicker({ onScheduled, onCancel }) {
           className="focus:outline-none transition ease-in-out duration-100 inline-flex cursor-pointer hover:bg-chrome-100 dark:hover:bg-chrome-700 p-1 rounded-full mr-2"
           onClick={onCancel}
         >
-          <svg className="h-5 w-5 text-chrome-700 dark:text-chrome-200 inline-flex" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+          <svg
+            className="h-5 w-5 text-chrome-700 dark:text-chrome-200 inline-flex"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M15 19l-7-7 7-7"
+            />
           </svg>
         </button>
-        <span className="text-lg font-bold text-chrome-900 dark:text-chrome-50">Repeat Schedule</span>
+        <span className="text-lg font-bold text-chrome-900 dark:text-chrome-50">
+          Repeat Schedule
+        </span>
       </div>
 
       <div className="flex-1 overflow-y-auto space-y-4">
         <div>
-          <div className="text-xs font-semibold text-chrome-500 dark:text-chrome-400 uppercase tracking-wider mb-1">Frequency</div>
+          <div className="text-xs font-semibold text-chrome-500 dark:text-chrome-400 uppercase tracking-wider mb-1">
+            Frequency
+          </div>
           <div className="flex gap-1">
             {["daily", "weekly", "monthly", "yearly"].map(function (f) {
               return (
                 <div
                   key={f}
-                  className={"px-3 py-1.5 rounded-full text-sm cursor-pointer border " + (frequency === f
-                    ? "border-accent bg-accent-light dark:bg-accent-darkbg text-accent dark:text-accent-dark"
-                    : "border-chrome-300 dark:border-chrome-700 text-chrome-700 dark:text-chrome-200 hover:border-chrome-400 dark:hover:border-chrome-500")}
-                  onClick={function () { setFrequency(f); }}
+                  className={
+                    "px-3 py-1.5 rounded-full text-sm cursor-pointer border " +
+                    (frequency === f
+                      ? "border-accent bg-accent-light dark:bg-accent-darkbg text-accent dark:text-accent-dark"
+                      : "border-chrome-300 dark:border-chrome-700 text-chrome-700 dark:text-chrome-200 hover:border-chrome-400 dark:hover:border-chrome-500")
+                  }
+                  onClick={function () {
+                    setFrequency(f);
+                  }}
                 >
                   {f.charAt(0).toUpperCase() + f.slice(1)}
                 </div>
@@ -680,17 +787,24 @@ function RecurringPicker({ onScheduled, onCancel }) {
 
         {frequency === "weekly" && (
           <div>
-            <div className="text-xs font-semibold text-chrome-500 dark:text-chrome-400 uppercase tracking-wider mb-1">Days</div>
+            <div className="text-xs font-semibold text-chrome-500 dark:text-chrome-400 uppercase tracking-wider mb-1">
+              Days
+            </div>
             <div className="flex gap-1">
               {dayNames.map(function (name, i) {
                 var active = weekdays.includes(i);
                 return (
                   <div
                     key={i}
-                    className={"w-10 h-10 rounded-full flex items-center justify-center text-sm cursor-pointer border " + (active
-                      ? "border-accent bg-accent-light dark:bg-accent-darkbg text-accent dark:text-accent-dark"
-                      : "border-chrome-300 dark:border-chrome-700 text-chrome-700 dark:text-chrome-200 hover:border-chrome-400 dark:hover:border-chrome-500")}
-                    onClick={function () { toggleWeekday(i); }}
+                    className={
+                      "w-10 h-10 rounded-full flex items-center justify-center text-sm cursor-pointer border " +
+                      (active
+                        ? "border-accent bg-accent-light dark:bg-accent-darkbg text-accent dark:text-accent-dark"
+                        : "border-chrome-300 dark:border-chrome-700 text-chrome-700 dark:text-chrome-200 hover:border-chrome-400 dark:hover:border-chrome-500")
+                    }
+                    onClick={function () {
+                      toggleWeekday(i);
+                    }}
                   >
                     {name.charAt(0)}
                   </div>
@@ -702,14 +816,24 @@ function RecurringPicker({ onScheduled, onCancel }) {
 
         {frequency === "monthly" && (
           <div>
-            <div className="text-xs font-semibold text-chrome-500 dark:text-chrome-400 uppercase tracking-wider mb-1">Day of month</div>
+            <div className="text-xs font-semibold text-chrome-500 dark:text-chrome-400 uppercase tracking-wider mb-1">
+              Day of month
+            </div>
             <select
               className="py-1 px-2 rounded-md bg-white dark:bg-chrome-800 border border-chrome-300 dark:border-chrome-900 cursor-pointer outline-none text-chrome-900 dark:text-chrome-50"
               value={dayOfMonth}
-              onChange={function (e) { setDayOfMonth(parseInt(e.target.value)); }}
+              onChange={function (e) {
+                setDayOfMonth(parseInt(e.target.value));
+              }}
             >
-              {Array.from({ length: 31 }, function (_, i) { return i + 1; }).map(function (d) {
-                return <option key={d} value={d}>{d}</option>;
+              {Array.from({ length: 31 }, function (_, i) {
+                return i + 1;
+              }).map(function (d) {
+                return (
+                  <option key={d} value={d}>
+                    {d}
+                  </option>
+                );
               })}
             </select>
           </div>
@@ -718,26 +842,44 @@ function RecurringPicker({ onScheduled, onCancel }) {
         {frequency === "yearly" && (
           <div className="flex gap-4">
             <div>
-              <div className="text-xs font-semibold text-chrome-500 dark:text-chrome-400 uppercase tracking-wider mb-1">Month</div>
+              <div className="text-xs font-semibold text-chrome-500 dark:text-chrome-400 uppercase tracking-wider mb-1">
+                Month
+              </div>
               <select
                 className="py-1 px-2 rounded-md bg-white dark:bg-chrome-800 border border-chrome-300 dark:border-chrome-900 cursor-pointer outline-none text-chrome-900 dark:text-chrome-50"
                 value={yearMonth}
-                onChange={function (e) { setYearMonth(parseInt(e.target.value)); }}
+                onChange={function (e) {
+                  setYearMonth(parseInt(e.target.value));
+                }}
               >
                 {monthNames.map(function (name, i) {
-                  return <option key={i} value={i}>{name}</option>;
+                  return (
+                    <option key={i} value={i}>
+                      {name}
+                    </option>
+                  );
                 })}
               </select>
             </div>
             <div>
-              <div className="text-xs font-semibold text-chrome-500 dark:text-chrome-400 uppercase tracking-wider mb-1">Day</div>
+              <div className="text-xs font-semibold text-chrome-500 dark:text-chrome-400 uppercase tracking-wider mb-1">
+                Day
+              </div>
               <select
                 className="py-1 px-2 rounded-md bg-white dark:bg-chrome-800 border border-chrome-300 dark:border-chrome-900 cursor-pointer outline-none text-chrome-900 dark:text-chrome-50"
                 value={yearDay}
-                onChange={function (e) { setYearDay(parseInt(e.target.value)); }}
+                onChange={function (e) {
+                  setYearDay(parseInt(e.target.value));
+                }}
               >
-                {Array.from({ length: 31 }, function (_, i) { return i + 1; }).map(function (d) {
-                  return <option key={d} value={d}>{d}</option>;
+                {Array.from({ length: 31 }, function (_, i) {
+                  return i + 1;
+                }).map(function (d) {
+                  return (
+                    <option key={d} value={d}>
+                      {d}
+                    </option>
+                  );
                 })}
               </select>
             </div>
@@ -745,7 +887,9 @@ function RecurringPicker({ onScheduled, onCancel }) {
         )}
 
         <div>
-          <div className="text-xs font-semibold text-chrome-500 dark:text-chrome-400 uppercase tracking-wider mb-1">Time</div>
+          <div className="text-xs font-semibold text-chrome-500 dark:text-chrome-400 uppercase tracking-wider mb-1">
+            Time
+          </div>
           <select
             className="py-1 px-2 rounded-md bg-white dark:bg-chrome-800 border border-chrome-300 dark:border-chrome-900 cursor-pointer outline-none text-chrome-900 dark:text-chrome-50"
             value={hour + ":" + minute}
@@ -756,7 +900,14 @@ function RecurringPicker({ onScheduled, onCancel }) {
             }}
           >
             {timeOptions.map(function (opt) {
-              return <option key={opt.hour + ":" + opt.minute} value={opt.hour + ":" + opt.minute}>{opt.label}</option>;
+              return (
+                <option
+                  key={opt.hour + ":" + opt.minute}
+                  value={opt.hour + ":" + opt.minute}
+                >
+                  {opt.label}
+                </option>
+              );
             })}
           </select>
         </div>
@@ -790,6 +941,7 @@ git commit -m "feat: add RecurringPicker UI component in popup"
 ### Task 7: Update `sendTabToNapTime` to accept and store `recurPattern`
 
 **Files:**
+
 - Modify: `src/popup.js` (the `sendTabToNapTime` function)
 - Test: `sendTabToNapTime.test.js`
 
@@ -804,7 +956,12 @@ test("stores recurPattern when provided", () => {
   chrome.storage.local.set.mockResolvedValueOnce();
   chrome.storage.local.get.mockResolvedValueOnce({ tabs: [{ when: 4000 }] });
 
-  const pattern = { frequency: "weekly", hour: 14, minute: 0, weekdays: [1, 3, 5] };
+  const pattern = {
+    frequency: "weekly",
+    hour: 14,
+    minute: 0,
+    weekdays: [1, 3, 5],
+  };
   sendTabToNapTime("Repeatedly", 4000, true, pattern);
 
   return flush().then(() => {
@@ -879,6 +1036,7 @@ git commit -m "feat: store recurPattern in tab data when snoozing"
 ### Task 8: Show recurring indicator in page.js tab list
 
 **Files:**
+
 - Modify: `src/page.js` (the tab list item rendering)
 
 **Step 1: Add a recurring badge to the tab list item**
@@ -914,13 +1072,33 @@ function describeRecurPattern(pattern) {
     case "daily":
       return "Daily";
     case "weekly":
-      var days = (pattern.weekdays || [1]).map(function (d) { return dayNames[d]; });
+      var days = (pattern.weekdays || [1]).map(function (d) {
+        return dayNames[d];
+      });
       return "Every " + days.join(", ");
     case "monthly":
       return "Monthly on the " + ordinal(pattern.dayOfMonth || 1);
     case "yearly":
-      var monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-      return "Yearly on " + monthNames[pattern.month || 0] + " " + (pattern.dayOfYear || 1);
+      var monthNames = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ];
+      return (
+        "Yearly on " +
+        monthNames[pattern.month || 0] +
+        " " +
+        (pattern.dayOfYear || 1)
+      );
     default:
       return "Recurring";
   }
@@ -950,6 +1128,7 @@ git commit -m "feat: show recurring schedule badge on snoozed tabs"
 ### Task 9: Final integration test and build
 
 **Files:**
+
 - All modified files
 
 **Step 1: Run the full test suite**
@@ -977,15 +1156,15 @@ git commit -m "chore: format and finalize recurring snooze feature"
 
 ## Summary of Changes
 
-| File | Change |
-|------|--------|
-| `src/shared.js` | Add `getNextRecurrence(pattern)` function with daily/weekly/monthly/yearly support |
-| `src/background.js` | Import shared.js; use `recurPattern` for rescheduling recurring tabs |
-| `src/popup.js` | Add `RecurringPicker` component; add `recurring` route; update `sendTabToNapTime` to accept `recurPattern`; change "Repeatedly" button to navigate to picker |
-| `src/page.js` | Add `describeRecurPattern` helper; show recurring badge on tab list items |
-| `page.test.js` | Add tests for `getNextRecurrence` (daily, weekly, monthly, yearly) |
-| `background.test.js` | Add tests for pattern-based rescheduling |
-| `sendTabToNapTime.test.js` | Add tests for storing recurPattern |
+| File                       | Change                                                                                                                                                       |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `src/shared.js`            | Add `getNextRecurrence(pattern)` function with daily/weekly/monthly/yearly support                                                                           |
+| `src/background.js`        | Import shared.js; use `recurPattern` for rescheduling recurring tabs                                                                                         |
+| `src/popup.js`             | Add `RecurringPicker` component; add `recurring` route; update `sendTabToNapTime` to accept `recurPattern`; change "Repeatedly" button to navigate to picker |
+| `src/page.js`              | Add `describeRecurPattern` helper; show recurring badge on tab list items                                                                                    |
+| `page.test.js`             | Add tests for `getNextRecurrence` (daily, weekly, monthly, yearly)                                                                                           |
+| `background.test.js`       | Add tests for pattern-based rescheduling                                                                                                                     |
+| `sendTabToNapTime.test.js` | Add tests for storing recurPattern                                                                                                                           |
 
 ## Notes for the Implementer
 

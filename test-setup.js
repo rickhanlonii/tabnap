@@ -13,7 +13,16 @@ global.DEFAULT_SETTINGS = {
 };
 
 global.COLOR_PALETTES = [
-  { id: "blue", name: "Blue", base: "#1A73E8", hover: "#1967D2", dark: "#8AB4F8", light: "#E8F0FE", focus: "#D2E3FC", darkBg: "#1E3A5F" },
+  {
+    id: "blue",
+    name: "Blue",
+    base: "#1A73E8",
+    hover: "#1967D2",
+    dark: "#8AB4F8",
+    light: "#E8F0FE",
+    focus: "#D2E3FC",
+    darkBg: "#1E3A5F",
+  },
 ];
 
 global.window = {

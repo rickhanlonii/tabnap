@@ -14,6 +14,7 @@ const DEBUG_BUTTONS = [
 
 function App() {
   const [route, setRoute] = React.useState("home");
+  const [pendingSnooze, setPendingSnooze] = React.useState(null);
   const settings = useChromeStorage("settings", DEFAULT_SETTINGS);
   useTheme(settings);
 
@@ -30,15 +31,23 @@ function App() {
           <Buttons
             onSelectDate={() => setRoute("date")}
             onSelectRecurring={() => setRoute("recurring")}
+            pendingSnooze={pendingSnooze}
+            onPendingSnoozeHandled={() => setPendingSnooze(null)}
           />
         ) : route === "date" ? (
           <DatePicker
-            onDateSelected={() => setRoute("home")}
+            onDateSelected={(label, when) => {
+              setPendingSnooze({ label: label, when: when, recurring: false, recurPattern: null, buttonText: "Pick a Date" });
+              setRoute("home");
+            }}
             onCancel={() => setRoute("home")}
           />
         ) : (
           <RecurringPicker
-            onScheduled={() => setRoute("home")}
+            onScheduled={(label, when, recurPattern) => {
+              setPendingSnooze({ label: label, when: when, recurring: true, recurPattern: recurPattern, buttonText: "Repeatedly" });
+              setRoute("home");
+            }}
             onCancel={() => setRoute("home")}
           />
         )}
@@ -242,13 +251,7 @@ function DatePicker({ onDateSelected, onCancel }) {
                   0,
                   0
                 );
-                snoozeSound.play();
-
-                sendTabToNapTime(
-                  selectedDate.toLocaleDateString(),
-                  selectedDate.getTime()
-                );
-                onDateSelected();
+                onDateSelected(selectedDate.toLocaleDateString(), selectedDate.getTime());
               }}
             >
               <div className="text-center text-sm leading-loose">{date}</div>
@@ -285,9 +288,7 @@ function RecurringPicker({ onScheduled, onCancel }) {
   function handleSchedule() {
     var pattern = buildPattern();
     var when = getNextRecurrence(pattern);
-    snoozeSound.play();
-    sendTabToNapTime("Repeatedly", when, true, pattern);
-    onScheduled();
+    onScheduled("Repeatedly", when, pattern);
   }
 
   function toggleWeekday(day) {
@@ -522,7 +523,7 @@ function RecurringPicker({ onScheduled, onCancel }) {
   );
 }
 
-function Buttons({ onSelectDate, onSelectRecurring }) {
+function Buttons({ onSelectDate, onSelectRecurring, pendingSnooze, onPendingSnoozeHandled }) {
   if (CURRENT_SETTINGS.debugMode) {
     return (
       <div className="h-full w-full grid grid-cols-3 grid-rows-3 grid-borders overflow-hidden">
@@ -552,35 +553,51 @@ function Buttons({ onSelectDate, onSelectRecurring }) {
         Icon={IconRepeat}
         time="pick"
         onSelect={onSelectRecurring}
+        pendingSnooze={pendingSnooze && pendingSnooze.buttonText === "Repeatedly" ? pendingSnooze : null}
+        onPendingSnoozeHandled={onPendingSnoozeHandled}
       ></Button>
       <Button
         text="Pick a Date"
         Icon={IconCalendar}
         time="pick"
         onSelect={onSelectDate}
+        pendingSnooze={pendingSnooze && pendingSnooze.buttonText === "Pick a Date" ? pendingSnooze : null}
+        onPendingSnoozeHandled={onPendingSnoozeHandled}
       ></Button>
     </div>
   );
 }
 
-function Button({ text, Icon, time, onSelect, when }) {
+function Button({ text, Icon, time, onSelect, when, pendingSnooze, onPendingSnoozeHandled }) {
   const [selected, setSelected] = React.useState(false);
+
+  function triggerSnooze(label, whenMs, recurring, recurPattern) {
+    snoozeSound.play();
+    setSelected(true);
+    sendTabToNapTime(label, whenMs, recurring, recurPattern);
+    setTimeout(() => {
+      setSelected(false);
+    }, 3000);
+  }
+
+  React.useEffect(() => {
+    if (pendingSnooze) {
+      triggerSnooze(pendingSnooze.label, pendingSnooze.when, pendingSnooze.recurring, pendingSnooze.recurPattern);
+      onPendingSnoozeHandled();
+    }
+  }, [pendingSnooze]);
+
   function handleClick() {
     if (time === "pick") {
       onSelect();
       return;
     }
 
-    snoozeSound.play();
-    setSelected(true);
-    sendTabToNapTime(
+    triggerSnooze(
       text,
       when ? when() : getWhenForTime(time, CURRENT_SETTINGS),
       time === "recurring"
     );
-    setTimeout(() => {
-      setSelected(false);
-    }, 3000);
   }
   return (
     <div

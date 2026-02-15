@@ -6,8 +6,8 @@ export function CTA() {
           Ready to snooze some tabs?
         </h2>
         <p className="mt-4 text-lg text-chrome-400">
-          Install TabNap in seconds. No account needed, no data collected,
-          works offline.
+          Install TabNap in seconds. No account needed, no data collected, works
+          offline.
         </p>
         <div className="mt-8">
           {/* TODO: Replace # with actual Chrome Web Store URL */}
