@@ -343,6 +343,15 @@ function getNextRecurrence(pattern) {
       }
       return candidate.getTime();
     }
+    case "yearly": {
+      var m = pattern.month != null ? pattern.month : 0;
+      var d = pattern.dayOfYear || 1;
+      var candidate = new Date(now.getFullYear(), m, d, hour, minute, 0);
+      if (candidate.getTime() <= now.getTime()) {
+        candidate = new Date(now.getFullYear() + 1, m, d, hour, minute, 0);
+      }
+      return candidate.getTime();
+    }
     default:
       return Date.now() + 86400000; // fallback: 24h from now
   }

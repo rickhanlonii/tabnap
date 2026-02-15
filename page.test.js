@@ -464,4 +464,33 @@ describe("getNextRecurrence", () => {
       jest.useRealTimers();
     });
   });
+
+  describe("yearly", () => {
+    test("returns this year if date/time have not passed", () => {
+      jest.useFakeTimers("modern");
+      jest.setSystemTime(new Date(2024, 0, 1, 7, 0, 0)); // Jan 1
+      const pattern = { frequency: "yearly", hour: 9, minute: 0, month: 5, dayOfYear: 15 }; // Jun 15
+      const result = new Date(getNextRecurrence(pattern));
+      expect(result).toBeDate(2024, 5, 15, 9, 0, 0);
+      jest.useRealTimers();
+    });
+
+    test("returns next year if date has passed", () => {
+      jest.useFakeTimers("modern");
+      jest.setSystemTime(new Date(2024, 6, 1, 10, 0, 0)); // Jul 1
+      const pattern = { frequency: "yearly", hour: 9, minute: 0, month: 5, dayOfYear: 15 }; // Jun 15
+      const result = new Date(getNextRecurrence(pattern));
+      expect(result).toBeDate(2025, 5, 15, 9, 0, 0);
+      jest.useRealTimers();
+    });
+
+    test("returns next year if same date but time has passed", () => {
+      jest.useFakeTimers("modern");
+      jest.setSystemTime(new Date(2024, 5, 15, 10, 0, 0)); // Jun 15, 10am
+      const pattern = { frequency: "yearly", hour: 9, minute: 0, month: 5, dayOfYear: 15 };
+      const result = new Date(getNextRecurrence(pattern));
+      expect(result).toBeDate(2025, 5, 15, 9, 0, 0);
+      jest.useRealTimers();
+    });
+  });
 });
