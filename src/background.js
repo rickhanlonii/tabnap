@@ -1,5 +1,6 @@
 if (typeof importScripts !== "undefined") {
   importScripts("/build/defaults.js");
+  importScripts("/build/icon-data.js");
   importScripts("/build/shared.js");
 }
 
