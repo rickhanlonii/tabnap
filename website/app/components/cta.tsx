@@ -10,9 +10,8 @@ export function CTA() {
           offline.
         </p>
         <div className="mt-8">
-          {/* TODO: Replace # with actual Chrome Web Store URL */}
           <a
-            href="#"
+            href="https://chromewebstore.google.com/detail/djoiloodageglokcnogknbkljhkdicjm?utm_source=item-share-cb"
             className="rounded-lg bg-violet-500 px-8 py-4 text-lg font-semibold text-white shadow-sm hover:bg-violet-600 transition-colors inline-block"
           >
             Add to Chrome — It&apos;s Free

@@ -22,8 +22,7 @@ export function Footer() {
           </span>
         </div>
         <div className="flex gap-6 text-sm text-chrome-500">
-          {/* TODO: Replace # with actual Chrome Web Store URL */}
-          <a href="#" className="hover:text-chrome-300 transition-colors">
+          <a href="https://chromewebstore.google.com/detail/djoiloodageglokcnogknbkljhkdicjm?utm_source=item-share-cb" className="hover:text-chrome-300 transition-colors">
             Chrome Web Store
           </a>
           <a

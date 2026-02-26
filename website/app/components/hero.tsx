@@ -28,16 +28,15 @@ export function Hero() {
           choose. Free, and no account required.
         </p>
         <div className="mt-10 flex items-center justify-center gap-x-4">
-          {/* TODO: Replace # with actual Chrome Web Store URL */}
           <a
-            href="#"
+            href="https://chromewebstore.google.com/detail/djoiloodageglokcnogknbkljhkdicjm?utm_source=item-share-cb"
             className="rounded-lg bg-violet-500 px-6 py-3 text-base font-semibold text-white shadow-sm hover:bg-violet-600 transition-colors"
           >
             Add to Chrome — It&apos;s Free
           </a>
         </div>
         <p className="mt-4 text-sm text-chrome-500 dark:text-chrome-400">
-          Chrome Web Store listing coming soon
+          Available on the Chrome Web Store
         </p>
       </div>
     </section>
